@@ -1,104 +1,101 @@
-# ⚔️ Grimoire HUD — AD&D 2nd Edition Player Companion
+# ⚔️ Grimoire HUD v4.0 — AD&D 2nd Edition Player Companion
 
-A mobile-first, offline-capable character manager and player HUD for Advanced Dungeons & Dragons 2nd Edition. Built as a single-page PWA with zero dependencies, hosted free on GitHub Pages.
+A mobile-first, offline-capable character manager and player HUD for Advanced Dungeons & Dragons 2nd Edition. Features a Diablo-style equipment screen, 485 searchable spells, 28 playable races (PHB + Complete Book of Humanoids), and persistent local storage. Zero dependencies. Free on GitHub Pages.
 
 ## ✨ Features
 
-**Full 2E Rules Engine** — All six ability score tables (STR with exceptional strength, DEX, CON, INT, WIS, CHR), THAC0 by class/level, saving throws for all class groups, XP tables for all 9 classes, and spell slot tables for wizards, priests, paladins, rangers, and bards.
+### 28 Playable Races
+- **PHB (6):** Human, Elf, Half-Elf, Dwarf, Gnome, Halfling
+- **PHBR10 Complete Book of Humanoids (22):** Aarakocra, Alaghi, Beastman, Bugbear, Bullywug, Centaur, Firbolg, Voadkyn, Flind, Fremlin, Gnoll, Goblin, Half-Ogre, Half-Orc, Hobgoblin, Kobold, Lizard Man, Minotaur, Mongrelman, Ogre, Ogre Mage, Orc
+- Full ability adjustments, class restrictions, level limits, special abilities per race
 
-**Widget Dashboard** — iOS-style widget grid with HP tracker, combat stats, ability scores, saving throws, XP with auto-level-up, gold per coin type, and spell slot management. Touch-optimized +/- controls for everything.
+### Diablo-Style Equipment Screen
+- 11 equipment slots with tap-to-equip workflow
+- Race/class/sex-accurate procedural SVG portrait
+- Slot swap popup with qualifying inventory items
+- Live stat updates (THAC0, AC, HP, Movement) on gear changes
+- 6 sub-tabs: Equipment, Consumables, Quest, Materials, Coins, Gems
 
-**Procedural Portraits** — Every character gets a unique SVG bust portrait generated from their race, class, and sex with proper armor, weapons, headgear, racial features, and facial details.
+### Complete Rules Engine
+- All 6 ability score tables with every sub-attribute
+- Dual-class (Humans) and Multi-class (Demihumans) support
+- THAC0, saving throws, spell slots per class and level
+- 15 PHB armor types with auto AC calculation
+- Tappable ability scores with draggable detail popups
 
-**Auto-Generated Appearance** — Prose character descriptions generated from stats, race, class, level, and physical characteristics. "A seasoned shadow-walker whose eyes constantly assess every room for exits..."
+### 485 Searchable Spells
+- 310 wizard spells (levels 1-9) + 175 priest spells (levels 1-7)
+- Search by name, filter by level
+- Spellbook management with memorization tracking
+- Spell detail modal with all PHB attributes
 
-**Equipment Autocomplete** — 100+ items from the PHB equipment lists with weight and GP cost, searchable as you type.
+### Inventory & Treasure
+- Smart item detection (60+ name patterns → correct icon and category)
+- 35+ predefined D&D gem types by value tier
+- Quick Loot popup for rapid item acquisition
+- Encumbrance tracking (weight vs STR allowance)
 
-**Adventure Journal** — Timestamped entries to chronicle your character's deeds.
+### Special Abilities Card
+- Race-specific: natural AC, size, movement, advantages, disadvantages, languages
+- Class-specific: up to 12 class abilities per class
+- Level limits for humanoid races
 
-**Tutorial Mascot** — "Grak the Adequate," a cartoony orc wizard who offers context-aware tips based on what you're doing, plus rotating D&D puns.
+## 🚀 Setup
 
-**Animated Dice Roller** — Full-screen overlay with correct polyhedra shapes (d4 triangle through d100 double-d10), spinning animation, sparks, and bouncing results.
-
-**Bulletproof Storage** — Dual-write to both IndexedDB and localStorage on every save. If either fails, the other catches it. JSON export/import for backups.
-
-## 🚀 Quick Start
-
-### Use It Right Now
-Visit: `https://YOUR-USERNAME.github.io/grimoire-hud/`
-
-### Install on Your Phone
-1. Open the link in Safari (iOS) or Chrome (Android)
-2. Tap **Share → Add to Home Screen**
-3. It installs as a standalone app with offline support
-
-### Host Your Own Copy
 1. **Fork** this repository
-2. Go to **Settings → Pages**
-3. Under **Source**, select **Deploy from a branch**
-4. Choose **main** branch, **/ (root)** folder
-5. Click **Save**
-6. Your site will be live at `https://YOUR-USERNAME.github.io/grimoire-hud/` within minutes
+2. **Settings → Pages → Source → main / root → Save**
+3. Live at `https://YOUR-USERNAME.github.io/grimoire-hud/`
+4. On phone: **Share → Add to Home Screen**
 
 ## 📁 Repository Structure
 
 ```
 grimoire-hud/
-├── index.html          ← The entire app (single file, zero dependencies)
-├── 404.html            ← Copy of index.html (GitHub Pages SPA fallback)
-├── manifest.json       ← PWA manifest for home screen install
-├── sw.js               ← Service Worker for offline caching
+├── index.html          ← The entire app (253KB, zero dependencies)
+├── 404.html            ← SPA fallback (identical copy)
+├── manifest.json       ← PWA manifest (13 icon sizes)
+├── sw.js               ← Service Worker v7 (offline caching)
+├── favicon.ico         ← Browser tab icon
+├── .nojekyll           ← Skip Jekyll processing
 ├── icons/
-│   ├── icon-192.png    ← PWA icon (192×192)
-│   └── icon-512.png    ← PWA icon (512×512)
-├── PROGRESS.md         ← Development progress tracker
-├── NEXT_STEPS.md       ← Roadmap for future development
-└── README.md           ← This file
+│   ├── icon-16.png     ← Favicon
+│   ├── icon-32.png
+│   ├── icon-48.png
+│   ├── icon-72.png
+│   ├── icon-96.png
+│   ├── icon-128.png
+│   ├── icon-144.png
+│   ├── icon-152.png
+│   ├── icon-167.png
+│   ├── icon-180.png
+│   ├── icon-192.png    ← Android home screen
+│   ├── icon-384.png
+│   ├── icon-512.png    ← Splash screen
+│   └── apple-touch-icon.png
+├── PROGRESS.md         ← Development history & completed loops
+├── NEXT_STEPS.md       ← Roadmap & architecture notes
+├── CHANGELOG.md        ← Version history
+├── README.md           ← This file
+└── LICENSE             ← MIT
 ```
 
-## 🎮 How to Use
+## 📋 Tabs
 
-1. **Create a Character** — Tap "Forge New Character", fill in name/race/class/sex, roll abilities with 4d6-drop-lowest, set HP and level
-2. **Use the HUD** — Tap +/- buttons to track HP, XP, and gold during play
-3. **Manage Spells** — Tap spell slot dots to mark as cast, use Long Rest to restore all
-4. **Track Inventory** — Start typing an item name to search the equipment database
-5. **Write Your Chronicle** — Use the Journal tab to record session events
-6. **Roll Dice** — Use the Combat tab's dice buttons for animated rolls
-7. **Ask Grak** — Tap the orc wizard in the bottom-right for context-aware tips
+| Tab | Content |
+|-----|---------|
+| **HUD** | HP, Combat, Abilities (tappable), Saves, Special Abilities, Gold & XP, Spell Slots |
+| **EQUIP** | Diablo-style equipment slots + portrait + character details + inventory grid |
+| **COMBAT** | Effective THAC0, AC breakdown, to-hit table (AC 10 to -10), saving throws, dice roller |
+| **SPELLS** | Spell slot tracker, searchable spell browser, spellbook management |
+| **JOURNAL** | Adventure chronicle with timestamped entries |
 
-## 🔧 Technical Details
+## 📜 Data Sources
 
-- **Zero frameworks** — Vanilla JavaScript, CSS, and HTML
-- **Zero build step** — Just open `index.html`
-- **~90KB total** — Loads instantly on any connection
-- **Hash routing** — Works perfectly on GitHub Pages without server config
-- **Offline-first** — Service Worker caches all assets
-- **PWA installable** — Add to home screen on iOS/Android
-- **Dual-write storage** — IndexedDB primary + localStorage fallback
-
-## 📊 AD&D 2E Rules Coverage
-
-| System | Status |
-|--------|--------|
-| Ability Score Tables (all 6) | ✅ Complete |
-| Exceptional Strength (18/01-18/00) | ✅ Complete |
-| THAC0 (all class groups, levels 1-20+) | ✅ Complete |
-| Saving Throws (all categories & class groups) | ✅ Complete |
-| XP Tables (all 9 classes) | ✅ Complete |
-| Spell Slots (Wizard, Priest, Paladin, Ranger, Bard) | ✅ Complete |
-| Equipment Database (100+ items) | ✅ Complete |
-| Encumbrance Tracking | ✅ Complete |
-| Race/Class Restrictions | 🔲 Planned |
-| Full Spell Database | 🔲 Planned |
-| Proficiency System | 🔲 Planned |
-
-## 📜 Credits
-
-- **Portraits**: Procedurally generated SVG (original work)
-- **Game Icons**: [game-icons.net](https://game-icons.net) (CC BY 3.0) by Lorc, Delapouite, and contributors
-- **Fonts**: [Google Fonts](https://fonts.google.com/) — Cinzel, MedievalSharp, Crimson Text, Press Start 2P
-- **AD&D 2nd Edition**: Trademark of Wizards of the Coast. This is an unofficial fan-made utility.
+- **Player's Handbook** (AD&D 2E) — Abilities, races, classes, equipment, spells
+- **PHBR10: Complete Book of Humanoids** — 22 humanoid races with full stat blocks
+- All data extracted and structured as canonical JSON in the project knowledge files
 
 ## 📄 License
 
-This project is released under the [MIT License](LICENSE). The AD&D rules system is the intellectual property of Wizards of the Coast. This tool is a non-commercial fan utility and does not reproduce copyrighted text.
+MIT License. See LICENSE file.
+AD&D is a trademark of Wizards of the Coast. This is an unofficial fan utility.

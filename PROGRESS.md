@@ -1,59 +1,107 @@
-# GRIMOIRE HUD v3.0 — Progress Tracker
+# Grimoire HUD — Development Progress
 
-## v3.0 Changes (This Sprint)
+## Version: 4.0 (Build 7)
+**Date:** April 2026  
+**Status:** Feature-complete through RALPH Loop 4.5+  
+**File:** `index.html` (253KB, 2402 lines, zero dependencies)
 
-### 1. Completely Rewritten Portrait System
-The old portraits were blocky blobs with minimal detail. The new system renders **detailed bust portraits** with:
-- **Proper body silhouettes** — shoulders with class-appropriate armor (plate for warriors, robes for wizards, vestments for priests, leather for rogues)
-- **Class-specific armor details** — Paladin golden cross on breastplate, Ranger green cloak draped over shoulder, Druid leaf-green garments
-- **Weapons per class** — Fighter sword with crossguard, Paladin holy blade with golden pommel, Ranger bow with string, Mage staff with glowing orb, Cleric flanged mace, Druid gnarled staff with leaf, Thief dagger, Bard lute
-- **Headgear** — Fighter helm with crest, Paladin crown-helm, Ranger feathered cap, Wizard pointed hat with star gem, Cleric mitre with holy cross, Druid antler circlet with nature gem, Thief dark hood, Bard jaunty feathered beret
-- **Racial ears** — Elf/Half-Elf pointed ears at correct angles, Gnome large rounded ears, Dwarf/Halfling subtle human ears, all proportioned
-- **Facial hair** — Dwarf males get thick braided beards, Gnome males get goatees, randomized stubble for other male characters
-- **Female features** — flowing hair locks, eyelashes, softer jaw, slightly larger eyes
-- **Eye detail** — white sclera, race-tinted iris (green for elves, brown for dwarves, blue for gnomes), highlight dots
-- **Size scaling** — Halflings/Gnomes rendered 85% with translate offset, Dwarves at 90%
+---
 
-### 2. Context-Aware Mascot with Puns
-Grak the Adequate now tracks what the user last interacted with:
-- **HP buttons** → shows HP management tips
-- **XP buttons** → shows XP/leveling tips  
-- **Gold buttons** → shows encumbrance/coin weight tips
-- **Spell slots** → shows memorization/rest tips
-- **Dice roller** → shows THAC0/combat roll tips
-- **Inventory** → shows gear/encumbrance tips
-- **Journal** → shows journaling tips
-- **Tab switches** → sets context (Stats→abilities, Combat→combat, etc.)
-- **Character creator** → shows creation tips
+## Completed Loops
 
-Each tip popup now includes a **random D&D pun/joke** before the crossed-out bad advice and good tip:
-- "Why did the fighter break up with the wizard? There was no chemistry — only THAC0!"
-- "What's a bard's favorite chord? A-minor… damage."
-- "A skeleton walks into a tavern and orders a drink and a mop."
-- 15 total jokes that cycle on each toggle
+### Loop 4.1 — Critical Bug Fixes ✅
+- [x] **B1:** AC formula fixed (`base + dex_adj`, not `base - dex_adj`)
+- [x] **B2:** STR hit/damage bonuses wired into combat tab and to-hit table
+- [x] **B3:** Hit table extended from AC 0 to AC -10 (21 columns)
+- [x] **B4:** Ability scores refresh on character save; auto-level from XP
 
-### 3. Auto-Generated Appearance Description
-New `Appearance.generate()` system creates prose descriptions from character data:
-- **STR/CON** → build description (powerfully muscled, athletic, lean, frail)
-- **Height/Race** → stature (tall and graceful for elves, barely three feet for halflings)
-- **Race** → facial features (high cheekbones and pointed ears for elves, braided beard for dwarves, hairy feet for halflings)
-- **CHR** → attractiveness (strikingly beautiful, plain-featured, unsettling countenance)
-- **INT** → gaze quality (sharp, calculating intelligence)
-- **WIS** → aura (serene awareness, ancient wisdom)
-- **DEX** → movement (catlike grace, clumsy and heavy-footed)
-- **Class + Level** → flavor text scaled by level (fledgling/capable/seasoned/veteran/legendary)
-- **CON** → health indicators (unnatural vitality, fragile health)
+### Loop 4.2 — PHB Data Library Integration ✅
+- [x] 15 armor types + 4 shields inlined from `armor.json`
+- [x] Race→class filtering from `races.json` (Dwarf can't pick Mage, etc.)
+- [x] Racial ability adjustments displayed in creator
+- [x] Armor/shield dropdowns with class restrictions
+- [x] WIS table (magical defense, bonus spells, spell failure)
+- [x] CHR table (max henchmen, loyalty, reaction)
+- [x] `getArmorAC()` — AC computed from equipped armor + shield + DEX + magic
 
-The creator has a **textarea** for appearance with an "Auto-Generate From Stats" button. If no appearance is saved, the Stats tab auto-generates one on the fly.
+### Loop 4.3 — Dual-Class & Multi-Class ✅
+- [x] Dual-class engine for Humans (prime req 15+/17+, unlock logic)
+- [x] Multi-class engine for Demihumans (valid combos per race, XP split)
+- [x] `multiThac0()`, `multiSaves()`, `multiSlots()` — best-of calculations
+- [x] `dualThac0()`, `dualSaves()` — new-vs-old class resolution
+- [x] `classLabel()` utility — displays "Fighter/Mage (5/4)" or "Fighter 5 → Mage 3"
 
-### 4. Enhanced Stats Tab
-The Stats tab now shows:
-- Large portrait with gold-trimmed panel
-- Character summary (name, level, sex, race, class)
-- Physical details (height, weight, age, alignment)
-- Characteristics in italic
-- Appearance description in a parchment-style block with gold left border
-- Full ability tables (STR, DEX, CON, INT, WIS, CHR with all sub-attributes)
+### Loop 4.4 — Treasure System & Bug Reporting ✅
+- [x] Gems, Jewels, Art Objects with name/value/qty
+- [x] 35+ predefined D&D gem types organized by value tier
+- [x] Total treasure value banner (coins + gems + jewels + art)
+- [x] In-app bug report form with auto-context and clipboard copy
+- [x] Version bumped to v4.0 in settings
 
-### Data Safety
-All previous bulletproof dual-write (IndexedDB + localStorage) architecture retained. No data loss possible.
+### Loop 4.5 — Spell Database ✅
+- [x] 310 wizard spells (levels 1-9) inlined as compact arrays
+- [x] 175 priest spells (levels 1-7) inlined as compact arrays
+- [x] Searchable browser with name search + level filter
+- [x] Spell detail modal with all PHB attributes
+- [x] Spellbook management (add/remove spells for wizards)
+- [x] Auto-detect wizard vs priest based on character class
+
+### Loop 4.5+ — Diablo-Style Equipment Screen ✅
+- [x] 11 equipment slots in two columns flanking character portrait
+- [x] Tap-to-select → tap-to-move state machine
+- [x] Slot validation (items only equip to matching slots)
+- [x] Auto-swap on occupied slots
+- [x] Slot tap popup with REMOVE + qualifying inventory items for quick swap
+- [x] Race/class/sex-accurate procedural SVG portrait (not generic silhouette)
+- [x] Equipped item icon overlays on portrait (weapon, shield, helm)
+- [x] Live stats bar (THAC0, AC, HP, MV) updating on gear changes
+- [x] AC auto-syncs with PHB_ARMOR when chest/shield equipped
+- [x] 6 inventory sub-tabs: Equipment, Consumables, Quest, Materials, Coins, Gems
+- [x] "+" add button per sub-tab with smart equipment search
+- [x] Character details panel (class, level, XP to next, abilities, race specials)
+
+### Loop 4.6 — Complete Book of Humanoids Integration ✅
+- [x] 22 humanoid races from PHBR10 added (28 total playable races)
+- [x] Full ability adjustments, class restrictions, level limits per race
+- [x] `RACE_SPECIALS` — natural AC, size, movement, advantages, disadvantages, languages
+- [x] `CLASS_SPECIALS` — all 9 class ability lists from PHB
+- [x] New ⚡ Special Abilities HUD card showing race + class abilities
+- [x] EQUIP details panel shows race specials summary
+
+### UX Polish ✅
+- [x] Tappable ability scores → draggable detail popup (all 6 abilities)
+- [x] Auto-close popups on new open or tab switch
+- [x] Combined Gold & XP card with ⚡ Quick Loot button
+- [x] Quick Loot popup with smart search (100+ PHB items)
+- [x] Mascot (Grak) — starts hidden, "?" toggle button, click-draggable
+- [x] `detectItemType()` — shared function for 60+ item name patterns
+- [x] Proper icons per item type (🕯️ candle, 🔥 torch, 🏮 lantern, etc.)
+- [x] Auto-fix stale icons on existing inventory items
+- [x] STATS and GEAR tabs removed (content merged into HUD and EQUIP)
+
+---
+
+## Technical Stats
+
+| Metric | Value |
+|--------|-------|
+| Total file size | 253 KB |
+| Total lines | 2,402 |
+| JS braces | 1,506/1,506 (balanced) |
+| Dependencies | 0 (vanilla JS) |
+| Playable races | 28 (6 PHB + 22 PHBR10) |
+| Spells | 485 (310 wizard + 175 priest) |
+| Equipment items | 100+ in autocomplete |
+| Gem presets | 35+ by value tier |
+| Ability tables | All 6 with full sub-attributes |
+| Armor types | 15 + 4 shields |
+| Icon sizes | 13 (16px through 512px) |
+| Storage | Dual-write IndexedDB + localStorage |
+
+## Data Sources
+
+| Source | Files Used | Content |
+|--------|-----------|---------|
+| PHB Ch 1-6 | `abilities.json`, `races.json`, `classes.json`, `armor.json`, `weapons.json`, `gear.json`, `alignments.json` | Core rules engine |
+| PHB Ch 7+ | `wizard_spells.json`, `priest_spells.json`, `spell_schools.json`, `spell_spheres.json` | Spell database |
+| PHBR10 | `humanoid_races.json`, `humanoid_kits.json`, `humanoid_proficiencies.json`, `humanoid_weapons.json`, `humanoid_traits.json` | 22 humanoid races |
