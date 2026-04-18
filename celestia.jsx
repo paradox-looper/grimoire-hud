@@ -1,80 +1,4 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-<title>Celestia — Natal Chart Studio</title>
-<meta name="description" content="Precision natal chart astrology with transit forecasting. Private, offline-capable, beautiful.">
-<meta name="theme-color" content="#0a0a18">
-
-<!-- PWA -->
-<link rel="manifest" href="manifest.json">
-<link rel="icon" type="image/svg+xml" href="icon.svg">
-<link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
-
-<!-- iOS -->
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="Celestia">
-<link rel="apple-touch-icon" href="apple-touch-icon.png">
-
-<!-- Open Graph -->
-<meta property="og:title" content="Celestia — Natal Chart Studio">
-<meta property="og:description" content="Precision natal chart astrology with transit forecasting.">
-<meta property="og:type" content="website">
-
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-
-<style>
-  * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-  html, body { height: 100%; width: 100%; overflow: hidden; overscroll-behavior: none; }
-  #root { height: 100%; width: 100%; overflow: hidden; }
-  body {
-    font-family: 'Outfit', -apple-system, BlinkMacSystemFont, sans-serif;
-    background: #0a0a18;
-    color: #e2e8f0;
-    padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
-  }
-  select, input, textarea { font-size: 16px !important; } /* prevents iOS zoom */
-  @media(max-width:768px) { .sidebar-desktop { display: none !important; } }
-  /* Smooth scroll restoration */
-  * { -webkit-overflow-scrolling: touch; }
-</style>
-</head>
-<body>
-<div id="root"><div style="display:flex;align-items:center;justify-content:center;height:100vh;color:#a78bfa;font-family:sans-serif;flex-direction:column;gap:12px"><div style="font-size:32px">✦</div><div style="font-size:14px;letter-spacing:2px">CELESTIA</div><div style="font-size:11px;color:#555770">Loading...</div></div></div>
-
-<script>
-window.onerror = function(msg, src, line, col, err) {
-  var details = msg + '\nLine: ' + line + ', Col: ' + col;
-  if (err && err.stack) details += '\n\n' + err.stack;
-  document.getElementById('root').innerHTML = '<div style="padding:20px;color:#ef4444;font-family:monospace;font-size:11px;white-space:pre-wrap;overflow:auto;height:100vh;line-height:1.5"><h2 style="color:#fbbf24;margin-bottom:12px;font-size:16px">Error</h2>' + details.replace(/[<>]/g, function(c){return c==='<'?'&lt;':'&gt;';}) + '</div>';
-  return true;
-};
-// Kill any old service workers that may be caching broken files
-if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.getRegistrations().then(function(regs) {
-    regs.forEach(function(r) { r.unregister(); });
-  });
-  if (caches) caches.keys().then(function(names) {
-    names.forEach(function(n) { caches.delete(n); });
-  });
-}
-</script>
-<script src="https://unpkg.com/react@18.2.0/umd/react.production.min.js"></script>
-<script src="https://unpkg.com/react-dom@18.2.0/umd/react.production.min.js"></script>
-<script>
-if (typeof React === 'undefined') {
-  document.write('<scr'+'ipt src="https://cdn.jsdelivr.net/npm/react@18.2.0/umd/react.production.min.js"><\/scr'+'ipt>');
-  document.write('<scr'+'ipt src="https://cdn.jsdelivr.net/npm/react-dom@18.2.0/umd/react.production.min.js"><\/scr'+'ipt>');
-}
-</script>
-<script>
- function _optionalChain(ops) { let lastAccessLHS = undefined; let value = ops[0]; let i = 1; while (i < ops.length) { const op = ops[i]; const fn = ops[i + 1]; i += 2; if ((op === 'optionalAccess' || op === 'optionalCall') && value == null) { return undefined; } if (op === 'access' || op === 'optionalAccess') { lastAccessLHS = value; value = fn(value); } else if (op === 'call' || op === 'optionalCall') { value = fn((...args) => value.call(lastAccessLHS, ...args)); lastAccessLHS = undefined; } } return value; }
-function appMain() {
-const { useState, useEffect, useCallback, useRef } = React;
+import { useState, useEffect, useCallback, useRef } from "react";
 
 /* ═══════════════════════════════════════════════════════════════
    CELESTIA v2 — Complete Natal Chart Astrology Application
@@ -479,7 +403,7 @@ const HOUSE_IX={
 
 // ── localStorage ───────────────────────────────────────────────
 const LS={
-  load:(k,d)=>{try{return JSON.parse(localStorage.getItem("celestia_"+k))||d}catch (e2){return d}},
+  load:(k,d)=>{try{return JSON.parse(localStorage.getItem("celestia_"+k))||d}catch{return d}},
   save:(k,v)=>localStorage.setItem("celestia_"+k,JSON.stringify(v)),
 };
 
@@ -524,97 +448,97 @@ function Wheel({chart,size=420,theme:TH,zsys}){
     if (s.type === "planet") {
       const p = s.data, pl = chart.pl[p.key]; if (!pl) return null;
       const dig = getDignity(p.name, pl.sign);
-      const interp = _optionalChain([IX, 'access', _2 => _2[p.key], 'optionalAccess', _3 => _3[pl.sign]]);
+      const interp = IX[p.key]?.[pl.sign];
       const pAspects = chart.aspects.filter(a => a.p1 === p.key || a.p2 === p.key).slice(0, 5);
-      return (React.createElement('div', null
-        , React.createElement('div', { style: {display:"flex",alignItems:"center",gap:8,marginBottom:8},}
-          , React.createElement('span', { style: {fontSize:24,color:p.color},}, p.sym)
-          , React.createElement('div', null, React.createElement('div', { style: {fontSize:15,fontWeight:700,color:TH.text},}, p.name), React.createElement('div', { style: {fontSize:11,color:TH.textMuted},}, p.type))
-        )
-        , React.createElement('div', { style: {display:"flex",alignItems:"center",gap:6,marginBottom:8,background:`${pl.signColor}12`,borderRadius:6,padding:"5px 8px"},}
-          , React.createElement('span', { style: {color:pl.signColor,fontSize:16},}, pl.signSym)
-          , React.createElement('span', { style: {fontSize:13,color:TH.text},}, pl.sign, " " , pl.deg)
-          , pl.rx&&React.createElement('span', { style: {color:TH.rose,fontSize:10,marginLeft:"auto"},}, "℞ Retrograde" )
-        )
-        , React.createElement('div', { style: {fontSize:11,color:TH.textMuted,marginBottom:6},}, "House " , pl.house, " · "  , _optionalChain([HOUSE_IX, 'access', _4 => _4[pl.house], 'optionalAccess', _5 => _5.split, 'call', _6 => _6(","), 'access', _7 => _7[0]]))
-        , dig&&React.createElement('div', { style: {fontSize:11,color:dig.color,marginBottom:6},}, dig.icon, " " , dig.type)
-        , zsys==="sidereal"&&React.createElement('div', { style: {fontSize:11,color:TH.accent,marginBottom:6},}, "Nakshatra: " , pl.nak)
-        , interp&&React.createElement('div', { style: {fontSize:11,color:TH.textMuted,lineHeight:1.5,borderTop:`1px solid ${TH.borderLight}`,paddingTop:6,marginTop:4},}, interp)
-        , pAspects.length>0&&React.createElement('div', { style: {borderTop:`1px solid ${TH.borderLight}`,paddingTop:6,marginTop:6},}
-          , React.createElement('div', { style: {fontSize:10,color:TH.textDim,letterSpacing:1,textTransform:"uppercase",marginBottom:4},}, "Aspects")
-          , pAspects.map((a,i)=>{const other=a.p1===p.key?a.p2:a.p1;const op=PLANETS.find(pp=>pp.key===other);return (
-            React.createElement('div', { key: i, style: {display:"flex",alignItems:"center",gap:4,fontSize:11,color:TH.textMuted,padding:"2px 0"},}
-              , React.createElement('span', { style: {color:a.asp.color},}, a.asp.sym, " " , a.asp.name)
-              , React.createElement('span', { style: {color:_optionalChain([op, 'optionalAccess', _8 => _8.color])},}, _optionalChain([op, 'optionalAccess', _9 => _9.sym]), " " , _optionalChain([op, 'optionalAccess', _10 => _10.name]))
-              , React.createElement('span', { style: {marginLeft:"auto",color:TH.textDim},}, a.orb, "°")
-            ))})
-        )
-      ));
+      return (<div>
+        <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:8}}>
+          <span style={{fontSize:24,color:p.color}}>{p.sym}</span>
+          <div><div style={{fontSize:15,fontWeight:700,color:TH.text}}>{p.name}</div><div style={{fontSize:11,color:TH.textMuted}}>{p.type}</div></div>
+        </div>
+        <div style={{display:"flex",alignItems:"center",gap:6,marginBottom:8,background:`${pl.signColor}12`,borderRadius:6,padding:"5px 8px"}}>
+          <span style={{color:pl.signColor,fontSize:16}}>{pl.signSym}</span>
+          <span style={{fontSize:13,color:TH.text}}>{pl.sign} {pl.deg}</span>
+          {pl.rx&&<span style={{color:TH.rose,fontSize:10,marginLeft:"auto"}}>℞ Retrograde</span>}
+        </div>
+        <div style={{fontSize:11,color:TH.textMuted,marginBottom:6}}>House {pl.house} · {HOUSE_IX[pl.house]?.split(",")[0]}</div>
+        {dig&&<div style={{fontSize:11,color:dig.color,marginBottom:6}}>{dig.icon} {dig.type}</div>}
+        {zsys==="sidereal"&&<div style={{fontSize:11,color:TH.accent,marginBottom:6}}>Nakshatra: {pl.nak}</div>}
+        {interp&&<div style={{fontSize:11,color:TH.textMuted,lineHeight:1.5,borderTop:`1px solid ${TH.borderLight}`,paddingTop:6,marginTop:4}}>{interp}</div>}
+        {pAspects.length>0&&<div style={{borderTop:`1px solid ${TH.borderLight}`,paddingTop:6,marginTop:6}}>
+          <div style={{fontSize:10,color:TH.textDim,letterSpacing:1,textTransform:"uppercase",marginBottom:4}}>Aspects</div>
+          {pAspects.map((a,i)=>{const other=a.p1===p.key?a.p2:a.p1;const op=PLANETS.find(pp=>pp.key===other);return (
+            <div key={i} style={{display:"flex",alignItems:"center",gap:4,fontSize:11,color:TH.textMuted,padding:"2px 0"}}>
+              <span style={{color:a.asp.color}}>{a.asp.sym} {a.asp.name}</span>
+              <span style={{color:op?.color}}>{op?.sym} {op?.name}</span>
+              <span style={{marginLeft:"auto",color:TH.textDim}}>{a.orb}°</span>
+            </div>)})}
+        </div>}
+      </div>);
     }
     if (s.type === "sign") {
       const sg = s.data;
-      const planetsInSign = PLANETS.filter(p => _optionalChain([chart, 'access', _11 => _11.pl, 'access', _12 => _12[p.key], 'optionalAccess', _13 => _13.sign]) === sg.n);
-      return (React.createElement('div', null
-        , React.createElement('div', { style: {display:"flex",alignItems:"center",gap:8,marginBottom:8},}
-          , React.createElement('span', { style: {fontSize:28,color:sg.c},}, sg.s)
-          , React.createElement('div', null, React.createElement('div', { style: {fontSize:15,fontWeight:700,color:TH.text},}, sg.n)
-          , React.createElement('div', { style: {fontSize:11,color:TH.textMuted},}, sg.el, " · "  , sg.mod, " · Ruler: "   , sg.ruler))
-        )
-        , planetsInSign.length>0?React.createElement('div', null, planetsInSign.map(p=>{const pl=chart.pl[p.key];return (
-          React.createElement('div', { key: p.key, style: {display:"flex",alignItems:"center",gap:6,fontSize:12,color:TH.textMuted,padding:"3px 0"},}
-            , React.createElement('span', { style: {color:p.color},}, p.sym), React.createElement('span', { style: {color:TH.text},}, p.name), React.createElement('span', null, _optionalChain([pl, 'optionalAccess', _14 => _14.deg]))
-            , _optionalChain([pl, 'optionalAccess', _15 => _15.rx])&&React.createElement('span', { style: {color:TH.rose,fontSize:10},}, "℞")
-          ))})):React.createElement('div', { style: {fontSize:11,color:TH.textDim},}, "No planets in "   , sg.n)
-      ));
+      const planetsInSign = PLANETS.filter(p => chart.pl[p.key]?.sign === sg.n);
+      return (<div>
+        <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:8}}>
+          <span style={{fontSize:28,color:sg.c}}>{sg.s}</span>
+          <div><div style={{fontSize:15,fontWeight:700,color:TH.text}}>{sg.n}</div>
+          <div style={{fontSize:11,color:TH.textMuted}}>{sg.el} · {sg.mod} · Ruler: {sg.ruler}</div></div>
+        </div>
+        {planetsInSign.length>0?<div>{planetsInSign.map(p=>{const pl=chart.pl[p.key];return (
+          <div key={p.key} style={{display:"flex",alignItems:"center",gap:6,fontSize:12,color:TH.textMuted,padding:"3px 0"}}>
+            <span style={{color:p.color}}>{p.sym}</span><span style={{color:TH.text}}>{p.name}</span><span>{pl?.deg}</span>
+            {pl?.rx&&<span style={{color:TH.rose,fontSize:10}}>℞</span>}
+          </div>)})}</div>:<div style={{fontSize:11,color:TH.textDim}}>No planets in {sg.n}</div>}
+      </div>);
     }
     if (s.type === "house") {
-      const hi = s.data, planetsInHouse = PLANETS.filter(p => _optionalChain([chart, 'access', _16 => _16.pl, 'access', _17 => _17[p.key], 'optionalAccess', _18 => _18.house]) === hi);
+      const hi = s.data, planetsInHouse = PLANETS.filter(p => chart.pl[p.key]?.house === hi);
       const cusp = chart.houses[hi-1], sg = getSign(cusp);
-      return (React.createElement('div', null
-        , React.createElement('div', { style: {fontSize:20,fontFamily:FONT_D,color:TH.lavender,marginBottom:6},}, "House " , hi)
-        , React.createElement('div', { style: {fontSize:12,color:TH.textMuted,marginBottom:6},}, "Cusp: " , React.createElement('span', { style: {color:sg.c},}, sg.s), " " , sg.n, " " , fmtDeg(cusp))
-        , React.createElement('div', { style: {fontSize:11,color:TH.textMuted,lineHeight:1.5,marginBottom:8},}, HOUSE_IX[hi])
-        , planetsInHouse.length>0&&React.createElement('div', { style: {borderTop:`1px solid ${TH.borderLight}`,paddingTop:6},}
-          , planetsInHouse.map(p=>{const pl=chart.pl[p.key];return (
-            React.createElement('div', { key: p.key, style: {display:"flex",alignItems:"center",gap:6,fontSize:12,color:TH.textMuted,padding:"2px 0"},}
-              , React.createElement('span', { style: {color:p.color},}, p.sym), React.createElement('span', { style: {color:TH.text},}, p.name), React.createElement('span', null, "in " , _optionalChain([pl, 'optionalAccess', _19 => _19.sign]), " " , _optionalChain([pl, 'optionalAccess', _20 => _20.deg]))
-            ))})
-        )
-      ));
+      return (<div>
+        <div style={{fontSize:20,fontFamily:FONT_D,color:TH.lavender,marginBottom:6}}>House {hi}</div>
+        <div style={{fontSize:12,color:TH.textMuted,marginBottom:6}}>Cusp: <span style={{color:sg.c}}>{sg.s}</span> {sg.n} {fmtDeg(cusp)}</div>
+        <div style={{fontSize:11,color:TH.textMuted,lineHeight:1.5,marginBottom:8}}>{HOUSE_IX[hi]}</div>
+        {planetsInHouse.length>0&&<div style={{borderTop:`1px solid ${TH.borderLight}`,paddingTop:6}}>
+          {planetsInHouse.map(p=>{const pl=chart.pl[p.key];return (
+            <div key={p.key} style={{display:"flex",alignItems:"center",gap:6,fontSize:12,color:TH.textMuted,padding:"2px 0"}}>
+              <span style={{color:p.color}}>{p.sym}</span><span style={{color:TH.text}}>{p.name}</span><span>in {pl?.sign} {pl?.deg}</span>
+            </div>)})}
+        </div>}
+      </div>);
     }
     if (s.type === "aspect") {
       const a = s.data;
       const pp1=PLANETS.find(p=>p.key===a.p1),pp2=PLANETS.find(p=>p.key===a.p2);
       const pl1=chart.pl[a.p1],pl2=chart.pl[a.p2];
-      return (React.createElement('div', null
-        , React.createElement('div', { style: {display:"flex",alignItems:"center",gap:6,marginBottom:8},}
-          , React.createElement('span', { style: {color:_optionalChain([pp1, 'optionalAccess', _21 => _21.color]),fontSize:20},}, _optionalChain([pp1, 'optionalAccess', _22 => _22.sym]))
-          , React.createElement('span', { style: {color:a.asp.color,fontSize:20},}, a.asp.sym)
-          , React.createElement('span', { style: {color:_optionalChain([pp2, 'optionalAccess', _23 => _23.color]),fontSize:20},}, _optionalChain([pp2, 'optionalAccess', _24 => _24.sym]))
-        )
-        , React.createElement('div', { style: {fontSize:14,fontWeight:600,color:a.asp.color,marginBottom:4},}, _optionalChain([pp1, 'optionalAccess', _25 => _25.name]), " " , a.asp.name, " " , _optionalChain([pp2, 'optionalAccess', _26 => _26.name]))
-        , React.createElement('div', { style: {fontSize:12,color:TH.textMuted},}, "Orb: " , a.orb, "°", a.exact?" (exact)":"")
-        , React.createElement('div', { style: {fontSize:11,color:TH.textMuted,marginTop:4},}, _optionalChain([pp1, 'optionalAccess', _27 => _27.name]), ": " , _optionalChain([pl1, 'optionalAccess', _28 => _28.sign]), " " , _optionalChain([pl1, 'optionalAccess', _29 => _29.deg]), " (H" , _optionalChain([pl1, 'optionalAccess', _30 => _30.house]), ")")
-        , React.createElement('div', { style: {fontSize:11,color:TH.textMuted},}, _optionalChain([pp2, 'optionalAccess', _31 => _31.name]), ": " , _optionalChain([pl2, 'optionalAccess', _32 => _32.sign]), " " , _optionalChain([pl2, 'optionalAccess', _33 => _33.deg]), " (H" , _optionalChain([pl2, 'optionalAccess', _34 => _34.house]), ")")
-      ));
+      return (<div>
+        <div style={{display:"flex",alignItems:"center",gap:6,marginBottom:8}}>
+          <span style={{color:pp1?.color,fontSize:20}}>{pp1?.sym}</span>
+          <span style={{color:a.asp.color,fontSize:20}}>{a.asp.sym}</span>
+          <span style={{color:pp2?.color,fontSize:20}}>{pp2?.sym}</span>
+        </div>
+        <div style={{fontSize:14,fontWeight:600,color:a.asp.color,marginBottom:4}}>{pp1?.name} {a.asp.name} {pp2?.name}</div>
+        <div style={{fontSize:12,color:TH.textMuted}}>Orb: {a.orb}°{a.exact?" (exact)":""}</div>
+        <div style={{fontSize:11,color:TH.textMuted,marginTop:4}}>{pp1?.name}: {pl1?.sign} {pl1?.deg} (H{pl1?.house})</div>
+        <div style={{fontSize:11,color:TH.textMuted}}>{pp2?.name}: {pl2?.sign} {pl2?.deg} (H{pl2?.house})</div>
+      </div>);
     }
     if (s.type === "angle") {
       const a = s.data;
       const sg = a.sign;
       const houseNum = a.l==="ASC"?1:a.l==="IC"?4:a.l==="DSC"?7:10;
       const meanings = {ASC:"Your rising sign — the mask you wear and how you appear to others. The lens through which you experience life.",MC:"Midheaven — your public image, career path, reputation, and highest aspirations. What you're known for.",DSC:"Descendant — what you seek in partnerships and relationships. The qualities you attract and are drawn to.",IC:"Imum Coeli — your deepest roots, home, family, private self, and emotional foundation."};
-      return (React.createElement('div', null
-        , React.createElement('div', { style: {display:"flex",alignItems:"center",gap:8,marginBottom:8},}
-          , React.createElement('span', { style: {fontSize:20,fontFamily:FONT_D,color:TH.accent},}, a.l)
-          , React.createElement('div', null, React.createElement('div', { style: {fontSize:14,fontWeight:700,color:TH.text},}, a.l==="ASC"?"Ascendant":a.l==="MC"?"Midheaven":a.l==="DSC"?"Descendant":"Imum Coeli")
-          , React.createElement('div', { style: {fontSize:11,color:TH.textMuted},}, "House " , houseNum, " cusp" ))
-        )
-        , React.createElement('div', { style: {display:"flex",alignItems:"center",gap:6,marginBottom:8,background:`${sg.c}12`,borderRadius:6,padding:"5px 8px"},}
-          , React.createElement('span', { style: {color:sg.c,fontSize:16},}, sg.s)
-          , React.createElement('span', { style: {fontSize:13,color:TH.text},}, sg.n, " " , a.deg)
-        )
-        , React.createElement('div', { style: {fontSize:12,color:TH.textMuted,lineHeight:1.7},}, meanings[a.l])
-      ));
+      return (<div>
+        <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:8}}>
+          <span style={{fontSize:20,fontFamily:FONT_D,color:TH.accent}}>{a.l}</span>
+          <div><div style={{fontSize:14,fontWeight:700,color:TH.text}}>{a.l==="ASC"?"Ascendant":a.l==="MC"?"Midheaven":a.l==="DSC"?"Descendant":"Imum Coeli"}</div>
+          <div style={{fontSize:11,color:TH.textMuted}}>House {houseNum} cusp</div></div>
+        </div>
+        <div style={{display:"flex",alignItems:"center",gap:6,marginBottom:8,background:`${sg.c}12`,borderRadius:6,padding:"5px 8px"}}>
+          <span style={{color:sg.c,fontSize:16}}>{sg.s}</span>
+          <span style={{fontSize:13,color:TH.text}}>{sg.n} {a.deg}</span>
+        </div>
+        <div style={{fontSize:12,color:TH.textMuted,lineHeight:1.7}}>{meanings[a.l]}</div>
+      </div>);
     }
     return null;
   };
@@ -625,163 +549,163 @@ function Wheel({chart,size=420,theme:TH,zsys}){
   if(popY<4)popY=sel?sel.y+20:0;
 
   return (
-    React.createElement('div', { ref: wrapRef, style: {position:"relative",display:"inline-block"},}
-      , React.createElement('svg', { width: size, height: size, viewBox: `0 0 ${size} ${size}`, style: {display:"block",maxWidth:"100%"},
-        onClick: (e)=>{if(e.target.tagName==="svg")dismiss()},}
-        , React.createElement('defs', null
-          , React.createElement('filter', { id: "gl",}, React.createElement('feGaussianBlur', { stdDeviation: "1.5", result: "b",}), React.createElement('feMerge', null, React.createElement('feMergeNode', { in: "b",}), React.createElement('feMergeNode', { in: "SourceGraphic",})))
-        )
+    <div ref={wrapRef} style={{position:"relative",display:"inline-block"}}>
+      <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} style={{display:"block",maxWidth:"100%"}}
+        onClick={(e)=>{if(e.target.tagName==="svg")dismiss()}}>
+        <defs>
+          <filter id="gl"><feGaussianBlur stdDeviation="1.5" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+        </defs>
 
-        /* Background circle */
-        , React.createElement('circle', { cx: cx, cy: cy, r: outerEdge, fill: TH.wheelBg2||"#0a0a18", stroke: TH.border, strokeWidth: "1.5",})
+        {/* Background circle */}
+        <circle cx={cx} cy={cy} r={outerEdge} fill={TH.wheelBg2||"#0a0a18"} stroke={TH.border} strokeWidth="1.5"/>
 
-        /* ── OUTER RING: Sign band with alternating fills ── */
-        , SIGNS.map((sg,i)=>{
+        {/* ── OUTER RING: Sign band with alternating fills ── */}
+        {SIGNS.map((sg,i)=>{
           const d=arcWedge(i*30,(i+1)*30,outerEdge-1,sR+1);
           const mid=i*30+15;
           const labelPt=pos2screen(mid,(outerEdge+sR)/2);
-          const isSelected=_optionalChain([sel, 'optionalAccess', _35 => _35.type])==="sign"&&_optionalChain([sel, 'optionalAccess', _36 => _36.data, 'optionalAccess', _37 => _37.n])===sg.n;
+          const isSelected=sel?.type==="sign"&&sel?.data?.n===sg.n;
           return (
-            React.createElement('g', { key: sg.n, style: {cursor:"pointer"}, onClick: (e)=>{e.stopPropagation();select("sign",sg,labelPt.x,labelPt.y)},}
-              , React.createElement('path', { d: d, fill: i%2===0?"rgba(167,139,250,0.04)":"rgba(167,139,250,0.09)", stroke: "none",})
-              /* Sign boundary line */
-              , React.createElement('line', { x1: pos2screen(i*30,sR).x, y1: pos2screen(i*30,sR).y, x2: pos2screen(i*30,outerEdge).x, y2: pos2screen(i*30,outerEdge).y, stroke: TH.border, strokeWidth: "0.8",})
-              /* Sign symbol */
-              , React.createElement('text', { x: labelPt.x, y: labelPt.y, textAnchor: "middle", dominantBaseline: "central",
-                fill: isSelected?sg.c:sg.c, fontSize: size*(isSelected?0.042:0.034), fontFamily: FONT,
-                opacity: isSelected?1:0.75,}, sg.s)
-            )
+            <g key={sg.n} style={{cursor:"pointer"}} onClick={(e)=>{e.stopPropagation();select("sign",sg,labelPt.x,labelPt.y)}}>
+              <path d={d} fill={i%2===0?"rgba(167,139,250,0.04)":"rgba(167,139,250,0.09)"} stroke="none"/>
+              {/* Sign boundary line */}
+              <line x1={pos2screen(i*30,sR).x} y1={pos2screen(i*30,sR).y} x2={pos2screen(i*30,outerEdge).x} y2={pos2screen(i*30,outerEdge).y} stroke={TH.border} strokeWidth="0.8"/>
+              {/* Sign symbol */}
+              <text x={labelPt.x} y={labelPt.y} textAnchor="middle" dominantBaseline="central"
+                fill={isSelected?sg.c:sg.c} fontSize={size*(isSelected?0.042:0.034)} fontFamily={FONT}
+                opacity={isSelected?1:0.75}>{sg.s}</text>
+            </g>
           );
-        })
+        })}
 
-        /* Sign/house boundary ring */
-        , React.createElement('circle', { cx: cx, cy: cy, r: sR, fill: "none", stroke: TH.accent, strokeWidth: "1", opacity: "0.4",})
+        {/* Sign/house boundary ring */}
+        <circle cx={cx} cy={cy} r={sR} fill="none" stroke={TH.accent} strokeWidth="1" opacity="0.4"/>
 
-        /* ── HOUSE WEDGES: Strong alternating fills ── */
-        , chart.houses.map((cusp,i)=>{
+        {/* ── HOUSE WEDGES: Strong alternating fills ── */}
+        {chart.houses.map((cusp,i)=>{
           const next=chart.houses[(i+1)%12];
           const d=arcWedge(cusp,next,sR-1,iR+1);
           const span=N(next-cusp)||360;
           const midDeg=cusp+span/2;
           const labelPt=pos2screen(midDeg,hR);
-          const isSelected=_optionalChain([sel, 'optionalAccess', _38 => _38.type])==="house"&&_optionalChain([sel, 'optionalAccess', _39 => _39.data])===i+1;
+          const isSelected=sel?.type==="house"&&sel?.data===i+1;
           // Strong alternating: odd houses darker
           const fillEven="rgba(167,139,250,0.03)";
           const fillOdd="rgba(167,139,250,0.10)";
           return (
-            React.createElement('g', { key: `h${i}`, style: {cursor:"pointer"}, onClick: (e)=>{e.stopPropagation();select("house",i+1,labelPt.x,labelPt.y)},}
-              , React.createElement('path', { d: d, fill: i%2===0?fillEven:fillOdd, stroke: "none",})
-              /* House number — large and clear */
-              , React.createElement('text', { x: labelPt.x, y: labelPt.y, textAnchor: "middle", dominantBaseline: "central",
-                fill: isSelected?TH.accent:TH.textDim,
-                fontSize: size*(isSelected?0.04:0.032),
-                fontWeight: isSelected?"800":"600",
-                fontFamily: FONT, opacity: isSelected?1:0.6,}, i+1)
-            )
+            <g key={`h${i}`} style={{cursor:"pointer"}} onClick={(e)=>{e.stopPropagation();select("house",i+1,labelPt.x,labelPt.y)}}>
+              <path d={d} fill={i%2===0?fillEven:fillOdd} stroke="none"/>
+              {/* House number — large and clear */}
+              <text x={labelPt.x} y={labelPt.y} textAnchor="middle" dominantBaseline="central"
+                fill={isSelected?TH.accent:TH.textDim}
+                fontSize={size*(isSelected?0.04:0.032)}
+                fontWeight={isSelected?"800":"600"}
+                fontFamily={FONT} opacity={isSelected?1:0.6}>{i+1}</text>
+            </g>
           );
-        })
+        })}
 
-        /* ── HOUSE CUSP LINES ── */
-        , chart.houses.map((cusp,i)=>{
+        {/* ── HOUSE CUSP LINES ── */}
+        {chart.houses.map((cusp,i)=>{
           const isAngular=(i===0||i===3||i===6||i===9);
           const innerPt=pos2screen(cusp,iR);
           const outerPt=pos2screen(cusp,sR);
           return (
-            React.createElement('line', { key: `cl${i}`, x1: innerPt.x, y1: innerPt.y, x2: outerPt.x, y2: outerPt.y,
-              stroke: isAngular?TH.accent:TH.border,
-              strokeWidth: isAngular?2.5:0.7,
-              opacity: isAngular?0.8:0.5,})
+            <line key={`cl${i}`} x1={innerPt.x} y1={innerPt.y} x2={outerPt.x} y2={outerPt.y}
+              stroke={isAngular?TH.accent:TH.border}
+              strokeWidth={isAngular?2.5:0.7}
+              opacity={isAngular?0.8:0.5}/>
           );
-        })
+        })}
 
-        /* ── ANGULAR AXIS LINES (ASC-DSC, MC-IC) extended through center ── */
-        , [{d1:chart.asc,d2:N(chart.asc+180)},{d1:chart.mc,d2:N(chart.mc+180)}].map(({d1,d2},i)=>{
+        {/* ── ANGULAR AXIS LINES (ASC-DSC, MC-IC) extended through center ── */}
+        {[{d1:chart.asc,d2:N(chart.asc+180)},{d1:chart.mc,d2:N(chart.mc+180)}].map(({d1,d2},i)=>{
           const p1=pos2screen(d1,sR),p2=pos2screen(d2,sR);
-          return React.createElement('line', { key: `ax${i}`, x1: p1.x, y1: p1.y, x2: p2.x, y2: p2.y, stroke: TH.accent, strokeWidth: "2", opacity: "0.5",});
-        })
+          return <line key={`ax${i}`} x1={p1.x} y1={p1.y} x2={p2.x} y2={p2.y} stroke={TH.accent} strokeWidth="2" opacity="0.5"/>;
+        })}
 
-        /* Inner circle */
-        , React.createElement('circle', { cx: cx, cy: cy, r: iR, fill: TH.wheelBg2||"#0a0a18", stroke: TH.border, strokeWidth: "1",})
+        {/* Inner circle */}
+        <circle cx={cx} cy={cy} r={iR} fill={TH.wheelBg2||"#0a0a18"} stroke={TH.border} strokeWidth="1"/>
 
-        /* ── ASPECT LINES ── */
-        , chart.aspects.filter(a=>a.asp.t==="major").slice(0,20).map((a,i)=>{
+        {/* ── ASPECT LINES ── */}
+        {chart.aspects.filter(a=>a.asp.t==="major").slice(0,20).map((a,i)=>{
           const p1=chart.pos[a.p1],p2=chart.pos[a.p2];
           if(!p1||!p2) return null;
           const c1=pos2screen(p1.lon,pR),c2=pos2screen(p2.lon,pR);
           const midX=(c1.x+c2.x)/2,midY=(c1.y+c2.y)/2;
-          const isSel=_optionalChain([sel, 'optionalAccess', _40 => _40.type])==="aspect"&&_optionalChain([sel, 'optionalAccess', _41 => _41.data, 'optionalAccess', _42 => _42.p1])===a.p1&&_optionalChain([sel, 'optionalAccess', _43 => _43.data, 'optionalAccess', _44 => _44.p2])===a.p2&&_optionalChain([sel, 'optionalAccess', _45 => _45.data, 'optionalAccess', _46 => _46.asp, 'optionalAccess', _47 => _47.name])===a.asp.name;
+          const isSel=sel?.type==="aspect"&&sel?.data?.p1===a.p1&&sel?.data?.p2===a.p2&&sel?.data?.asp?.name===a.asp.name;
           return (
-            React.createElement('g', { key: `a${i}`, style: {cursor:"pointer"}, onClick: (e)=>{e.stopPropagation();select("aspect",a,midX,midY)},}
-              , React.createElement('line', { x1: c1.x, y1: c1.y, x2: c2.x, y2: c2.y,
-                stroke: a.asp.color, strokeWidth: isSel?2.5:(a.exact?1.2:0.5),
-                opacity: isSel?0.9:(a.exact?0.5:0.2),
-                strokeDasharray: a.asp.name==="Opposition"?"4,3":"none",})
-              , React.createElement('line', { x1: c1.x, y1: c1.y, x2: c2.x, y2: c2.y, stroke: "transparent", strokeWidth: "8",})
-            )
+            <g key={`a${i}`} style={{cursor:"pointer"}} onClick={(e)=>{e.stopPropagation();select("aspect",a,midX,midY)}}>
+              <line x1={c1.x} y1={c1.y} x2={c2.x} y2={c2.y}
+                stroke={a.asp.color} strokeWidth={isSel?2.5:(a.exact?1.2:0.5)}
+                opacity={isSel?0.9:(a.exact?0.5:0.2)}
+                strokeDasharray={a.asp.name==="Opposition"?"4,3":"none"}/>
+              <line x1={c1.x} y1={c1.y} x2={c2.x} y2={c2.y} stroke="transparent" strokeWidth="8"/>
+            </g>
           );
-        })
+        })}
 
-        /* ── PLANET GLYPHS ── */
-        , PLANETS.map(p=>{
+        {/* ── PLANET GLYPHS ── */}
+        {PLANETS.map(p=>{
           const ppos=chart.pos[p.key]; if(!ppos) return null;
           const pt=pos2screen(ppos.lon,pR);
           const tick1=pos2screen(ppos.lon,sR-3),tick2=pos2screen(ppos.lon,sR+3);
-          const isSel=_optionalChain([sel, 'optionalAccess', _48 => _48.type])==="planet"&&_optionalChain([sel, 'optionalAccess', _49 => _49.data, 'optionalAccess', _50 => _50.key])===p.key;
+          const isSel=sel?.type==="planet"&&sel?.data?.key===p.key;
           const gr=size*(isSel?0.024:0.019);
           return (
-            React.createElement('g', { key: p.key, style: {cursor:"pointer"}, onClick: (e)=>{e.stopPropagation();select("planet",p,pt.x,pt.y)},}
-              , React.createElement('line', { x1: tick1.x, y1: tick1.y, x2: tick2.x, y2: tick2.y, stroke: p.color, strokeWidth: "1.5", opacity: "0.6",})
-              , isSel&&React.createElement('circle', { cx: pt.x, cy: pt.y, r: gr+5, fill: `${p.color}15`, stroke: p.color, strokeWidth: "0.5",})
-              , React.createElement('circle', { cx: pt.x, cy: pt.y, r: gr, fill: TH.bgDeep||"#0a0a18", stroke: p.color, strokeWidth: isSel?2:1.2,})
-              , React.createElement('text', { x: pt.x, y: pt.y, textAnchor: "middle", dominantBaseline: "central",
-                fill: p.color, fontSize: size*(isSel?0.03:0.025), fontFamily: FONT, fontWeight: isSel?"700":"500",}, p.sym)
-              , ppos.rx&&React.createElement('text', { x: pt.x+size*0.02, y: pt.y-size*0.016, fill: TH.rose, fontSize: size*0.012,}, "℞")
-            )
+            <g key={p.key} style={{cursor:"pointer"}} onClick={(e)=>{e.stopPropagation();select("planet",p,pt.x,pt.y)}}>
+              <line x1={tick1.x} y1={tick1.y} x2={tick2.x} y2={tick2.y} stroke={p.color} strokeWidth="1.5" opacity="0.6"/>
+              {isSel&&<circle cx={pt.x} cy={pt.y} r={gr+5} fill={`${p.color}15`} stroke={p.color} strokeWidth="0.5"/>}
+              <circle cx={pt.x} cy={pt.y} r={gr} fill={TH.bgDeep||"#0a0a18"} stroke={p.color} strokeWidth={isSel?2:1.2}/>
+              <text x={pt.x} y={pt.y} textAnchor="middle" dominantBaseline="central"
+                fill={p.color} fontSize={size*(isSel?0.03:0.025)} fontFamily={FONT} fontWeight={isSel?"700":"500"}>{p.sym}</text>
+              {ppos.rx&&<text x={pt.x+size*0.02} y={pt.y-size*0.016} fill={TH.rose} fontSize={size*0.012}>℞</text>}
+            </g>
           );
-        })
+        })}
 
-        /* ── ANGLE LABELS (ASC/MC/DSC/IC) — inside outer ring ── */
-        , [
+        {/* ── ANGLE LABELS (ASC/MC/DSC/IC) — inside outer ring ── */}
+        {[
           {l:"ASC",d:chart.asc,primary:true},
           {l:"MC",d:chart.mc,primary:true},
           {l:"DSC",d:N(chart.asc+180),primary:false},
           {l:"IC",d:N(chart.mc+180),primary:false}
         ].map(({l,d,primary})=>{
           const pt=pos2screen(d,outerEdge-16);
-          const isSel=_optionalChain([sel, 'optionalAccess', _51 => _51.type])==="angle"&&_optionalChain([sel, 'optionalAccess', _52 => _52.data, 'optionalAccess', _53 => _53.l])===l;
+          const isSel=sel?.type==="angle"&&sel?.data?.l===l;
           return (
-            React.createElement('g', { key: l, style: {cursor:"pointer"}, onClick: (e)=>{e.stopPropagation();select("angle",{l,d,deg:fmtDeg(d),sign:getSign(d)},pt.x,pt.y)},}
-              , React.createElement('rect', { x: pt.x-18, y: pt.y-10, width: "36", height: "20", rx: "4", fill: primary?(isSel?TH.accent+"40":TH.accent+"20"):(isSel?"rgba(255,255,255,0.1)":"rgba(255,255,255,0.04)"), stroke: primary?TH.accent:TH.textDim, strokeWidth: isSel?1.5:0.5,})
-              , React.createElement('text', { x: pt.x, y: pt.y, textAnchor: "middle", dominantBaseline: "central",
-                fill: primary?TH.accent:TH.textMuted,
-                fontSize: size*0.024,
-                fontWeight: "700", fontFamily: FONT,}, l)
-            )
+            <g key={l} style={{cursor:"pointer"}} onClick={(e)=>{e.stopPropagation();select("angle",{l,d,deg:fmtDeg(d),sign:getSign(d)},pt.x,pt.y)}}>
+              <rect x={pt.x-18} y={pt.y-10} width="36" height="20" rx="4" fill={primary?(isSel?TH.accent+"40":TH.accent+"20"):(isSel?"rgba(255,255,255,0.1)":"rgba(255,255,255,0.04)")} stroke={primary?TH.accent:TH.textDim} strokeWidth={isSel?1.5:0.5}/>
+              <text x={pt.x} y={pt.y} textAnchor="middle" dominantBaseline="central"
+                fill={primary?TH.accent:TH.textMuted}
+                fontSize={size*0.024}
+                fontWeight="700" fontFamily={FONT}>{l}</text>
+            </g>
           );
-        })
+        })}
 
-        /* Degree marks on outer edge — small ticks every 5° */
-        , Array.from({length:72},(_,i)=>{
+        {/* Degree marks on outer edge — small ticks every 5° */}
+        {Array.from({length:72},(_,i)=>{
           const deg=i*5;
           const p1=pos2screen(deg,outerEdge-1),p2=pos2screen(deg,outerEdge-(i%6===0?6:3));
-          return React.createElement('line', { key: `tick${i}`, x1: p1.x, y1: p1.y, x2: p2.x, y2: p2.y, stroke: TH.border, strokeWidth: i%6===0?0.8:0.4, opacity: "0.5",});
-        })
-      )
+          return <line key={`tick${i}`} x1={p1.x} y1={p1.y} x2={p2.x} y2={p2.y} stroke={TH.border} strokeWidth={i%6===0?0.8:0.4} opacity="0.5"/>;
+        })}
+      </svg>
 
-      /* Floating popup overlay */
-      , sel&&(
-        React.createElement('div', { style: {
+      {/* Floating popup overlay */}
+      {sel&&(
+        <div style={{
           position:"absolute",left:popX,top:popY,width:popW,maxHeight:320,overflowY:"auto",
           background:TH.bgDeep||"#0a0a18",border:`1px solid ${TH.border}`,borderRadius:12,
           padding:16,boxShadow:`0 12px 40px rgba(0,0,0,0.5), 0 0 20px ${TH.accentGlow}`,
           backdropFilter:"blur(16px)",zIndex:50,fontFamily:FONT,animation:"fadeIn 0.15s ease-out",
-        },}
-          , React.createElement('button', { onClick: dismiss, style: {position:"absolute",top:8,right:8,background:"transparent",border:"none",color:TH.textDim,fontSize:16,cursor:"pointer",padding:"2px 6px",borderRadius:4},}, "✕")
-          , popupContent()
-        )
-      )
-      , React.createElement('style', null, `@keyframes fadeIn{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:translateY(0)}}`)
-    )
+        }}>
+          <button onClick={dismiss} style={{position:"absolute",top:8,right:8,background:"transparent",border:"none",color:TH.textDim,fontSize:16,cursor:"pointer",padding:"2px 6px",borderRadius:4}}>✕</button>
+          {popupContent()}
+        </div>
+      )}
+      <style>{`@keyframes fadeIn{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:translateY(0)}}`}</style>
+    </div>
   );
 }
 
@@ -792,11 +716,11 @@ function Wheel({chart,size=420,theme:TH,zsys}){
 // ── Shared Components ──────────────────────────────────────────
 function Btn({children,onClick,primary,small,style:sx,...props}){
   const TH=props.theme||THEMES.dark;
-  return React.createElement('button', { onClick: onClick, style: {padding:small?"6px 12px":"12px 20px",borderRadius:8,background:primary?`linear-gradient(135deg,${TH.accent},${TH.accent2})`:TH.bgCard,color:primary?"#fff":TH.textMuted,fontFamily:FONT,fontSize:small?12:14,fontWeight:600,border:primary?"none":`1px solid ${TH.border}`,cursor:"pointer",transition:"all .2s",...sx},}, children)
+  return <button onClick={onClick} style={{padding:small?"6px 12px":"12px 20px",borderRadius:8,background:primary?`linear-gradient(135deg,${TH.accent},${TH.accent2})`:TH.bgCard,color:primary?"#fff":TH.textMuted,fontFamily:FONT,fontSize:small?12:14,fontWeight:600,border:primary?"none":`1px solid ${TH.border}`,cursor:"pointer",transition:"all .2s",...sx}}>{children}</button>
 }
 
 function Tabs({tabs,active,onChange,theme:TH}){
-  return React.createElement('div', { style: {display:"flex",gap:4,flexWrap:"wrap",marginBottom:16},}, tabs.map(t=>React.createElement('button', { key: t.id, onClick: ()=>onChange(t.id), style: {padding:"7px 14px",borderRadius:6,background:active===t.id?"rgba(255,255,255,0.06)":"transparent",color:active===t.id?TH.text:TH.textDim,border:`1px solid ${active===t.id?TH.borderLight:"transparent"}`,fontSize:12,fontFamily:FONT,cursor:"pointer"},}, t.label)))
+  return <div style={{display:"flex",gap:4,flexWrap:"wrap",marginBottom:16}}>{tabs.map(t=><button key={t.id} onClick={()=>onChange(t.id)} style={{padding:"7px 14px",borderRadius:6,background:active===t.id?"rgba(255,255,255,0.06)":"transparent",color:active===t.id?TH.text:TH.textDim,border:`1px solid ${active===t.id?TH.borderLight:"transparent"}`,fontSize:12,fontFamily:FONT,cursor:"pointer"}}>{t.label}</button>)}</div>
 }
 
 // ── City Database for Location Picker ──────────────────────────
@@ -892,7 +816,7 @@ const MONTHS=["January","February","March","April","May","June","July","August",
 
 function BirthForm({onSubmit,initial,onCancel,theme:TH}){
   const [d,setD]=useState(initial||{name:"",year:1990,month:6,day:15,hour:12,minute:0,latitude:40.7128,longitude:-74.006,location:"New York, NY",utcOffset:-5});
-  const [citySearch,setCitySearch]=useState(_optionalChain([initial, 'optionalAccess', _54 => _54.location])||"");
+  const [citySearch,setCitySearch]=useState(initial?.location||"");
   const [showCities,setShowCities]=useState(false);
   const [dst,setDst]=useState(false);
   const [geoResults,setGeoResults]=useState([]);
@@ -977,111 +901,111 @@ function BirthForm({onSubmit,initial,onCancel,theme:TH}){
   };
 
   return(
-    React.createElement('div', { style: {display:"flex",flexDirection:"column",gap:16},}
-      /* Name */
-      , React.createElement('div', null
-        , React.createElement('label', { style: lS,}, "Name")
-        , React.createElement('input', { style: iS, value: d.name, onChange: e=>setD({...d,name:e.target.value}), placeholder: "e.g. Sarah, Dad, Client #3"    ,})
-      )
+    <div style={{display:"flex",flexDirection:"column",gap:16}}>
+      {/* Name */}
+      <div>
+        <label style={lS}>Name</label>
+        <input style={iS} value={d.name} onChange={e=>setD({...d,name:e.target.value})} placeholder="e.g. Sarah, Dad, Client #3"/>
+      </div>
 
-      /* Date — Month / Day / Year dropdowns */
-      , React.createElement('div', null
-        , React.createElement('label', { style: lS,}, "Date of Birth"  )
-        , React.createElement('div', { style: {display:"grid",gridTemplateColumns:"2fr 1fr 1.2fr",gap:6},}
-          , React.createElement('select', { style: selS, value: d.month, onChange: e=>{const m=+e.target.value;const shouldDST=d.location?autoDST(m,d.utcOffset-(dst?1:0)):false;const baseTz=d.utcOffset-(dst?1:0);setD({...d,month:m,utcOffset:shouldDST?baseTz+1:baseTz});setDst(shouldDST)},}
-            , MONTHS.map((m,i)=>React.createElement('option', { key: i, value: i+1,}, m))
-          )
-          , React.createElement('select', { style: selS, value: d.day, onChange: e=>setD({...d,day:+e.target.value}),}
-            , Array.from({length:daysInMonth},(_,i)=>React.createElement('option', { key: i, value: i+1,}, i+1))
-          )
-          , React.createElement('select', { style: selS, value: d.year, onChange: e=>setD({...d,year:+e.target.value}),}
-            , Array.from({length:2050-1890+1},(_,i)=>1890+i).reverse().map(y=>React.createElement('option', { key: y, value: y,}, y))
-          )
-        )
-      )
+      {/* Date — Month / Day / Year dropdowns */}
+      <div>
+        <label style={lS}>Date of Birth</label>
+        <div style={{display:"grid",gridTemplateColumns:"2fr 1fr 1.2fr",gap:6}}>
+          <select style={selS} value={d.month} onChange={e=>{const m=+e.target.value;const shouldDST=d.location?autoDST(m,d.utcOffset-(dst?1:0)):false;const baseTz=d.utcOffset-(dst?1:0);setD({...d,month:m,utcOffset:shouldDST?baseTz+1:baseTz});setDst(shouldDST)}}>
+            {MONTHS.map((m,i)=><option key={i} value={i+1}>{m}</option>)}
+          </select>
+          <select style={selS} value={d.day} onChange={e=>setD({...d,day:+e.target.value})}>
+            {Array.from({length:daysInMonth},(_,i)=><option key={i} value={i+1}>{i+1}</option>)}
+          </select>
+          <select style={selS} value={d.year} onChange={e=>setD({...d,year:+e.target.value})}>
+            {Array.from({length:2050-1890+1},(_,i)=>1890+i).reverse().map(y=><option key={y} value={y}>{y}</option>)}
+          </select>
+        </div>
+      </div>
 
-      /* Time — Hour / Minute / AM-PM */
-      , React.createElement('div', null
-        , React.createElement('label', { style: lS,}, "Time of Birth"  )
-        , React.createElement('div', { style: {display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:6},}
-          , React.createElement('select', { style: selS, value: displayHour, onChange: e=>setTime(+e.target.value,d.minute,ampm),}
-            , Array.from({length:12},(_,i)=>React.createElement('option', { key: i, value: i===0?12:i,}, i===0?12:i))
-          )
-          , React.createElement('select', { style: selS, value: d.minute, onChange: e=>setTime(displayHour,+e.target.value,ampm),}
-            , Array.from({length:60},(_,i)=>React.createElement('option', { key: i, value: i,}, String(i).padStart(2,"0")))
-          )
-          , React.createElement('div', { style: {display:"flex",gap:0,borderRadius:8,overflow:"hidden",border:`1px solid ${TH.border}`},}
-            , ["AM","PM"].map(p=>(
-              React.createElement('button', { key: p, onClick: ()=>setTime(displayHour,d.minute,p), style: {flex:1,padding:"10px 0",background:ampm===p?TH.accentSoft:TH.inputBg,color:ampm===p?TH.accent:TH.textDim,border:"none",fontFamily:FONT,fontSize:13,fontWeight:600,cursor:"pointer"},}, p)
-            ))
-          )
-        )
-        , React.createElement('div', { style: {fontSize:10,color:TH.textDim,marginTop:4},}, "If birth time is unknown, use 12:00 PM (noon)"        )
-      )
+      {/* Time — Hour / Minute / AM-PM */}
+      <div>
+        <label style={lS}>Time of Birth</label>
+        <div style={{display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:6}}>
+          <select style={selS} value={displayHour} onChange={e=>setTime(+e.target.value,d.minute,ampm)}>
+            {Array.from({length:12},(_,i)=><option key={i} value={i===0?12:i}>{i===0?12:i}</option>)}
+          </select>
+          <select style={selS} value={d.minute} onChange={e=>setTime(displayHour,+e.target.value,ampm)}>
+            {Array.from({length:60},(_,i)=><option key={i} value={i}>{String(i).padStart(2,"0")}</option>)}
+          </select>
+          <div style={{display:"flex",gap:0,borderRadius:8,overflow:"hidden",border:`1px solid ${TH.border}`}}>
+            {["AM","PM"].map(p=>(
+              <button key={p} onClick={()=>setTime(displayHour,d.minute,p)} style={{flex:1,padding:"10px 0",background:ampm===p?TH.accentSoft:TH.inputBg,color:ampm===p?TH.accent:TH.textDim,border:"none",fontFamily:FONT,fontSize:13,fontWeight:600,cursor:"pointer"}}>{p}</button>
+            ))}
+          </div>
+        </div>
+        <div style={{fontSize:10,color:TH.textDim,marginTop:4}}>If birth time is unknown, use 12:00 PM (noon)</div>
+      </div>
 
-      /* Location — Nominatim live search + local fallback */
-      , React.createElement('div', { style: {position:"relative"},}
-        , React.createElement('label', { style: lS,}, "Birth Location" )
-        , React.createElement('input', { style: iS, value: citySearch, placeholder: "Type any city or town worldwide..."     , 
-          onChange: e=>handleCityInput(e.target.value),
-          onFocus: ()=>{if(citySearch.length>=2)setShowCities(true)},}
-        )
-        , showCities&&citySearch.length>=2&&(
-          React.createElement('div', { style: {position:"absolute",top:"100%",left:0,right:0,zIndex:100,marginTop:4,background:TH.bgDeep||"#1a1a2e",border:`1px solid ${TH.border}`,borderRadius:8,maxHeight:300,overflowY:"auto",boxShadow:"0 8px 32px rgba(0,0,0,0.3)"},}
-            , geoResults.map((c,i)=>(
-              React.createElement('button', { key: i, onClick: ()=>selectCity(c), style: {display:"block",width:"100%",padding:"10px 14px",background:"transparent",border:"none",borderBottom:`1px solid ${TH.borderLight}`,color:TH.text,fontFamily:FONT,fontSize:13,cursor:"pointer",textAlign:"left"},
-                onMouseEnter: e=>e.target.style.background=TH.accentSoft,
-                onMouseLeave: e=>e.target.style.background="transparent",}
-                , c.n
-                , React.createElement('span', { style: {fontSize:10,color:TH.textDim,marginLeft:8},}, c.lat.toFixed(2), "°, " , c.lon.toFixed(2), "°")
-                , c.online&&React.createElement('span', { style: {fontSize:9,color:TH.accent,marginLeft:4},}, "🌐")
-              )
-            ))
-            , geoLoading&&React.createElement('div', { style: {padding:"10px 14px",fontSize:11,color:TH.textDim},}, "🔍 Searching online..."  )
-            , !geoLoading&&geoResults.length===0&&(
-              React.createElement('div', { style: {padding:"14px"},}
-                , React.createElement('div', { style: {fontSize:12,color:TH.textMuted,marginBottom:6},}, "No matches for \""   , citySearch, "\"")
-                , React.createElement('div', { style: {fontSize:11,color:TH.textDim,lineHeight:1.6},}, "Enter coordinates below. Tip: Google \""     , React.createElement('strong', null, citySearch, " lat long"  ), "\" to find them. On GitHub Pages this search finds any city worldwide."            )
-              )
-            )
-          )
-        )
-        , d.location&&d.latitude!==0&&d.location===citySearch&&geoResults.length===0&&React.createElement('div', { style: {fontSize:10,color:TH.mint||TH.accent,marginTop:4},}, "✓ " , d.location, " (" , d.latitude.toFixed(4), "°, " , d.longitude.toFixed(4), "°)")
-      )
+      {/* Location — Nominatim live search + local fallback */}
+      <div style={{position:"relative"}}>
+        <label style={lS}>Birth Location</label>
+        <input style={iS} value={citySearch} placeholder="Type any city or town worldwide..." 
+          onChange={e=>handleCityInput(e.target.value)}
+          onFocus={()=>{if(citySearch.length>=2)setShowCities(true)}}
+        />
+        {showCities&&citySearch.length>=2&&(
+          <div style={{position:"absolute",top:"100%",left:0,right:0,zIndex:100,marginTop:4,background:TH.bgDeep||"#1a1a2e",border:`1px solid ${TH.border}`,borderRadius:8,maxHeight:300,overflowY:"auto",boxShadow:"0 8px 32px rgba(0,0,0,0.3)"}}>
+            {geoResults.map((c,i)=>(
+              <button key={i} onClick={()=>selectCity(c)} style={{display:"block",width:"100%",padding:"10px 14px",background:"transparent",border:"none",borderBottom:`1px solid ${TH.borderLight}`,color:TH.text,fontFamily:FONT,fontSize:13,cursor:"pointer",textAlign:"left"}}
+                onMouseEnter={e=>e.target.style.background=TH.accentSoft}
+                onMouseLeave={e=>e.target.style.background="transparent"}>
+                {c.n}
+                <span style={{fontSize:10,color:TH.textDim,marginLeft:8}}>{c.lat.toFixed(2)}°, {c.lon.toFixed(2)}°</span>
+                {c.online&&<span style={{fontSize:9,color:TH.accent,marginLeft:4}}>🌐</span>}
+              </button>
+            ))}
+            {geoLoading&&<div style={{padding:"10px 14px",fontSize:11,color:TH.textDim}}>🔍 Searching online...</div>}
+            {!geoLoading&&geoResults.length===0&&(
+              <div style={{padding:"14px"}}>
+                <div style={{fontSize:12,color:TH.textMuted,marginBottom:6}}>No matches for "{citySearch}"</div>
+                <div style={{fontSize:11,color:TH.textDim,lineHeight:1.6}}>Enter coordinates below. Tip: Google "<strong>{citySearch} lat long</strong>" to find them. On GitHub Pages this search finds any city worldwide.</div>
+              </div>
+            )}
+          </div>
+        )}
+        {d.location&&d.latitude!==0&&d.location===citySearch&&geoResults.length===0&&<div style={{fontSize:10,color:TH.mint||TH.accent,marginTop:4}}>✓ {d.location} ({d.latitude.toFixed(4)}°, {d.longitude.toFixed(4)}°)</div>}
+      </div>
 
-      /* Coordinates — always visible, editable */
-      , React.createElement('div', null
-        , React.createElement('label', { style: lS,}, "Coordinates " , React.createElement('span', { style: {color:TH.textDim,fontWeight:400},}, "(auto-filled, or enter manually)"   ))
-        , React.createElement('div', { style: {display:"grid",gridTemplateColumns:"1fr 1fr",gap:8},}
-          , React.createElement('input', { type: "number", step: "0.01", style: iS, placeholder: "Latitude", value: d.latitude, onChange: e=>setD({...d,latitude:+e.target.value}),})
-          , React.createElement('input', { type: "number", step: "0.01", style: iS, placeholder: "Longitude", value: d.longitude, onChange: e=>setD({...d,longitude:+e.target.value}),})
-        )
-      )
+      {/* Coordinates — always visible, editable */}
+      <div>
+        <label style={lS}>Coordinates <span style={{color:TH.textDim,fontWeight:400}}>(auto-filled, or enter manually)</span></label>
+        <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:8}}>
+          <input type="number" step="0.01" style={iS} placeholder="Latitude" value={d.latitude} onChange={e=>setD({...d,latitude:+e.target.value})}/>
+          <input type="number" step="0.01" style={iS} placeholder="Longitude" value={d.longitude} onChange={e=>setD({...d,longitude:+e.target.value})}/>
+        </div>
+      </div>
 
-      /* Timezone */
-      , React.createElement('div', null
-        , React.createElement('label', { style: lS,}, "Timezone")
-        , React.createElement('div', { style: {display:"flex",gap:6,alignItems:"center"},}
-          , React.createElement('select', { style: {...selS,flex:1}, value: d.utcOffset, onChange: e=>{const v=parseFloat(e.target.value);setD({...d,utcOffset:v});setDst(false)},}
-            , Array.from({length:53},(_,i)=>{const tz=-12+i*0.5;const label=tz>=0?"+"+tz:String(tz);const names={"-10":"HST","-9":"AKST","-8":"PST","-7":"MST/PDT","-6":"CST/MDT","-5":"EST/CDT","-4":"EDT/AST","-3":"BRT","0":"GMT/UTC","1":"CET","2":"EET","3":"MSK","4":"GST","5.5":"IST","8":"CST/SGT","9":"JST/KST","10":"AEST"};return (React.createElement('option', { key: tz, value: tz,}, "UTC " , label, names[String(tz)]?" ("+names[String(tz)]+")":""))})
-          )
-          , React.createElement('button', { type: "button", onClick: ()=>{if(!dst){setD({...d,utcOffset:d.utcOffset+1});setDst(true)}else{setD({...d,utcOffset:d.utcOffset-1});setDst(false)}}, style: {
+      {/* Timezone */}
+      <div>
+        <label style={lS}>Timezone</label>
+        <div style={{display:"flex",gap:6,alignItems:"center"}}>
+          <select style={{...selS,flex:1}} value={d.utcOffset} onChange={e=>{const v=parseFloat(e.target.value);setD({...d,utcOffset:v});setDst(false)}}>
+            {Array.from({length:53},(_,i)=>{const tz=-12+i*0.5;const label=tz>=0?"+"+tz:String(tz);const names={"-10":"HST","-9":"AKST","-8":"PST","-7":"MST/PDT","-6":"CST/MDT","-5":"EST/CDT","-4":"EDT/AST","-3":"BRT","0":"GMT/UTC","1":"CET","2":"EET","3":"MSK","4":"GST","5.5":"IST","8":"CST/SGT","9":"JST/KST","10":"AEST"};return (<option key={tz} value={tz}>UTC {label}{names[String(tz)]?" ("+names[String(tz)]+")":""}</option>)})}
+          </select>
+          <button type="button" onClick={()=>{if(!dst){setD({...d,utcOffset:d.utcOffset+1});setDst(true)}else{setD({...d,utcOffset:d.utcOffset-1});setDst(false)}}} style={{
             padding:"10px 12px",borderRadius:8,whiteSpace:"nowrap",
             background:dst?TH.accentSoft:TH.inputBg,
             color:dst?TH.accent:TH.textDim,
             border:`1px solid ${dst?TH.accent+"40":TH.border}`,
             fontFamily:FONT,fontSize:12,fontWeight:600,cursor:"pointer",
-          },}, dst?"☑ DST":"☐ DST")
-        )
-        , React.createElement('div', { style: {fontSize:10,color:TH.textDim,marginTop:4},}, "Auto-set when you pick a city. Tap DST if birth was during summer daylight saving time."               )
-      )
+          }}>{dst?"☑ DST":"☐ DST"}</button>
+        </div>
+        <div style={{fontSize:10,color:TH.textDim,marginTop:4}}>Auto-set when you pick a city. Tap DST if birth was during summer daylight saving time.</div>
+      </div>
 
-      /* Submit */
-      , React.createElement('div', { style: {display:"flex",gap:8,marginTop:4},}
-        , React.createElement(Btn, { primary: true, onClick: ()=>{setShowCities(false);onSubmit(d)}, theme: TH, style: {flex:1},}, "Generate Chart ✦"  )
-        , onCancel&&React.createElement(Btn, { onClick: onCancel, theme: TH,}, "Cancel")
-      )
-    )
+      {/* Submit */}
+      <div style={{display:"flex",gap:8,marginTop:4}}>
+        <Btn primary onClick={()=>{setShowCities(false);onSubmit(d)}} theme={TH} style={{flex:1}}>Generate Chart ✦</Btn>
+        {onCancel&&<Btn onClick={onCancel} theme={TH}>Cancel</Btn>}
+      </div>
+    </div>
   );
 }
 
@@ -1123,7 +1047,7 @@ function getAspectInterp(p1Key,p2Key,aspName,chart){
   else if(pair.includes("uranus")&&pair.includes("sun"))specific="A strong need for individual freedom and authenticity. "+aspName+" "+energy.split("—")[0]+". You resist conformity instinctively and may have experienced sudden disruptions to your sense of identity. Your path is unconventional, and trying to fit a standard mold creates deep restlessness.";
   // Generic but still meaningful
   if(!specific){
-    specific=`Your ${p1.name} (${t1}) ${energy.split("—")[0]} with your ${p2.name} (${t2}). ${aspName==="Square"?"This creates productive tension — "+p1.name+"'s expression must negotiate with "+p2.name+"'s demands, driving growth through effort.":aspName==="Trine"?"This is a natural gift — "+p1.name+" and "+p2.name+" support each other effortlessly, creating ease in how these life areas interact.":aspName==="Opposition"?"These energies seek balance — you may project "+p2.name+" qualities onto others until you integrate both sides consciously.":aspName==="Conjunction"?p1.name+" and "+p2.name+" are inseparable in your psyche — they amplify each other and express as a unified force.":p1.name+" and "+p2.name+" find a working relationship through this aspect."} In House ${_optionalChain([pl1, 'optionalAccess', _55 => _55.house])} and House ${_optionalChain([pl2, 'optionalAccess', _56 => _56.house])}, this plays out through ${_optionalChain([HOUSE_IX, 'access', _57 => _57[_optionalChain([pl1, 'optionalAccess', _58 => _58.house])], 'optionalAccess', _59 => _59.split, 'call', _60 => _60("."), 'access', _61 => _61[0], 'optionalAccess', _62 => _62.toLowerCase, 'call', _63 => _63()])} and ${_optionalChain([HOUSE_IX, 'access', _64 => _64[_optionalChain([pl2, 'optionalAccess', _65 => _65.house])], 'optionalAccess', _66 => _66.split, 'call', _67 => _67("."), 'access', _68 => _68[0], 'optionalAccess', _69 => _69.toLowerCase, 'call', _70 => _70()])}.`;
+    specific=`Your ${p1.name} (${t1}) ${energy.split("—")[0]} with your ${p2.name} (${t2}). ${aspName==="Square"?"This creates productive tension — "+p1.name+"'s expression must negotiate with "+p2.name+"'s demands, driving growth through effort.":aspName==="Trine"?"This is a natural gift — "+p1.name+" and "+p2.name+" support each other effortlessly, creating ease in how these life areas interact.":aspName==="Opposition"?"These energies seek balance — you may project "+p2.name+" qualities onto others until you integrate both sides consciously.":aspName==="Conjunction"?p1.name+" and "+p2.name+" are inseparable in your psyche — they amplify each other and express as a unified force.":p1.name+" and "+p2.name+" find a working relationship through this aspect."} In House ${pl1?.house} and House ${pl2?.house}, this plays out through ${HOUSE_IX[pl1?.house]?.split(".")[0]?.toLowerCase()} and ${HOUSE_IX[pl2?.house]?.split(".")[0]?.toLowerCase()}.`;
   }
   return specific;
 }
@@ -1132,126 +1056,126 @@ function InterpretTab({chart,TH,zsys}){
   const [open,setOpen]=useState(null);
   const [openAspect,setOpenAspect]=useState(null);
   return (
-    React.createElement('div', { style: {display:"flex",flexDirection:"column",gap:4,maxWidth:640},}
-      , PLANETS.slice(0,10).map(p=>{const pl=chart.pl[p.key];if(!pl)return null;
+    <div style={{display:"flex",flexDirection:"column",gap:4,maxWidth:640}}>
+      {PLANETS.slice(0,10).map(p=>{const pl=chart.pl[p.key];if(!pl)return null;
         const isOpen=open===p.key;
         const dig=getDignity(p.name,pl.sign);
         const pAspects=chart.aspects.filter(a=>a.p1===p.key||a.p2===p.key).slice(0,8);
         return (
-          React.createElement('div', { key: p.key, style: {background:isOpen?TH.bgCard:"transparent",border:`1px solid ${isOpen?TH.cardBorder:TH.borderLight}`,borderRadius:12,overflow:"hidden",transition:"all 0.2s"},}
-            , React.createElement('div', { onClick: ()=>{setOpen(isOpen?null:p.key);setOpenAspect(null)}, style: {display:"flex",alignItems:"center",gap:10,padding:"12px 16px",cursor:"pointer"},}
-              , React.createElement('span', { style: {fontSize:20,color:p.color},}, p.sym)
-              , React.createElement('span', { style: {fontSize:14,fontWeight:600,color:TH.text},}, p.name, " in "  , pl.sign)
-              , React.createElement('span', { style: {fontSize:11,color:pl.signColor},}, pl.signSym)
-              , React.createElement('span', { style: {fontSize:11,color:TH.textDim,marginLeft:"auto"},}, "H", pl.house)
-              , pl.rx&&React.createElement('span', { style: {color:TH.rose,fontSize:10},}, "℞")
-              , pAspects.length>0&&React.createElement('span', { style: {fontSize:9,color:TH.textDim,background:TH.borderLight,padding:"2px 5px",borderRadius:4},}, pAspects.length, " aspects" )
-              , React.createElement('span', { style: {color:TH.textDim,fontSize:12,marginLeft:4,transition:"transform 0.2s",transform:isOpen?"rotate(180deg)":"rotate(0deg)"},}, "▾")
-            )
-            , isOpen&&(
-              React.createElement('div', { style: {padding:"0 16px 16px",animation:"fadeIn 0.2s ease-out"},}
-                , dig&&React.createElement('div', { style: {fontSize:11,color:dig.color,marginBottom:8,padding:"3px 8px",background:`${dig.color}10`,borderRadius:5,display:"inline-block"},}, dig.icon, " " , dig.type, " in "  , pl.sign)
-                , zsys==="sidereal"&&React.createElement('div', { style: {fontSize:11,color:TH.accent,marginBottom:8},}, "✧ Nakshatra: "  , pl.nak)
-                , React.createElement('div', { style: {fontSize:13,color:TH.textMuted,lineHeight:1.7,marginBottom:12},}
-                  , _optionalChain([IX, 'access', _71 => _71[p.key], 'optionalAccess', _72 => _72[pl.sign]])||`${p.name} in ${pl.sign}: a unique combination blending ${p.name}'s energy with ${pl.sign}'s qualities.`
-                )
-                , React.createElement('div', { style: {fontSize:12,color:TH.textMuted,lineHeight:1.6,padding:"8px 10px",background:`${TH.accent}06`,borderRadius:8,marginBottom:12},}
-                  , React.createElement('span', { style: {fontWeight:600,color:TH.accent},}, "House " , pl.house, ":"), " " , _optionalChain([HOUSE_IX, 'access', _73 => _73[pl.house], 'optionalAccess', _74 => _74.split, 'call', _75 => _75("."), 'access', _76 => _76.slice, 'call', _77 => _77(0,2), 'access', _78 => _78.join, 'call', _79 => _79(".")])+"."
-                )
-                /* Integrated Aspects — expandable with specific interpretations */
-                , pAspects.length>0&&(
-                  React.createElement('div', null
-                    , React.createElement('div', { style: {fontSize:10,letterSpacing:1.5,color:TH.textDim,textTransform:"uppercase",marginBottom:6},}, "Natal Aspects" )
-                    , pAspects.map((a,i)=>{
+          <div key={p.key} style={{background:isOpen?TH.bgCard:"transparent",border:`1px solid ${isOpen?TH.cardBorder:TH.borderLight}`,borderRadius:12,overflow:"hidden",transition:"all 0.2s"}}>
+            <div onClick={()=>{setOpen(isOpen?null:p.key);setOpenAspect(null)}} style={{display:"flex",alignItems:"center",gap:10,padding:"12px 16px",cursor:"pointer"}}>
+              <span style={{fontSize:20,color:p.color}}>{p.sym}</span>
+              <span style={{fontSize:14,fontWeight:600,color:TH.text}}>{p.name} in {pl.sign}</span>
+              <span style={{fontSize:11,color:pl.signColor}}>{pl.signSym}</span>
+              <span style={{fontSize:11,color:TH.textDim,marginLeft:"auto"}}>H{pl.house}</span>
+              {pl.rx&&<span style={{color:TH.rose,fontSize:10}}>℞</span>}
+              {pAspects.length>0&&<span style={{fontSize:9,color:TH.textDim,background:TH.borderLight,padding:"2px 5px",borderRadius:4}}>{pAspects.length} aspects</span>}
+              <span style={{color:TH.textDim,fontSize:12,marginLeft:4,transition:"transform 0.2s",transform:isOpen?"rotate(180deg)":"rotate(0deg)"}}>▾</span>
+            </div>
+            {isOpen&&(
+              <div style={{padding:"0 16px 16px",animation:"fadeIn 0.2s ease-out"}}>
+                {dig&&<div style={{fontSize:11,color:dig.color,marginBottom:8,padding:"3px 8px",background:`${dig.color}10`,borderRadius:5,display:"inline-block"}}>{dig.icon} {dig.type} in {pl.sign}</div>}
+                {zsys==="sidereal"&&<div style={{fontSize:11,color:TH.accent,marginBottom:8}}>✧ Nakshatra: {pl.nak}</div>}
+                <div style={{fontSize:13,color:TH.textMuted,lineHeight:1.7,marginBottom:12}}>
+                  {IX[p.key]?.[pl.sign]||`${p.name} in ${pl.sign}: a unique combination blending ${p.name}'s energy with ${pl.sign}'s qualities.`}
+                </div>
+                <div style={{fontSize:12,color:TH.textMuted,lineHeight:1.6,padding:"8px 10px",background:`${TH.accent}06`,borderRadius:8,marginBottom:12}}>
+                  <span style={{fontWeight:600,color:TH.accent}}>House {pl.house}:</span> {HOUSE_IX[pl.house]?.split(".").slice(0,2).join(".")+"."}
+                </div>
+                {/* Integrated Aspects — expandable with specific interpretations */}
+                {pAspects.length>0&&(
+                  <div>
+                    <div style={{fontSize:10,letterSpacing:1.5,color:TH.textDim,textTransform:"uppercase",marginBottom:6}}>Natal Aspects</div>
+                    {pAspects.map((a,i)=>{
                       const other=a.p1===p.key?a.p2:a.p1;
                       const op=PLANETS.find(pp=>pp.key===other);
                       const opl=chart.pl[other];
                       const isAspOpen=openAspect===p.key+"-"+i;
                       const interp=getAspectInterp(a.p1,a.p2,a.asp.name,chart);
                       return (
-                        React.createElement('div', { key: i, style: {borderRadius:8,overflow:"hidden",border:`1px solid ${isAspOpen?a.asp.color+"30":"transparent"}`,marginBottom:3,background:isAspOpen?`${a.asp.color}06`:"transparent"},}
-                          , React.createElement('div', { onClick: ()=>setOpenAspect(isAspOpen?null:p.key+"-"+i), style: {display:"flex",alignItems:"center",gap:5,fontSize:12,color:TH.textMuted,padding:"6px 8px",cursor:"pointer"},}
-                            , React.createElement('span', { style: {color:a.asp.color,fontSize:14},}, a.asp.sym)
-                            , React.createElement('span', { style: {color:a.asp.color,fontWeight:600},}, a.asp.name)
-                            , React.createElement('span', { style: {color:_optionalChain([op, 'optionalAccess', _80 => _80.color])},}, _optionalChain([op, 'optionalAccess', _81 => _81.sym]))
-                            , React.createElement('span', null, _optionalChain([op, 'optionalAccess', _82 => _82.name]))
-                            , opl&&React.createElement('span', { style: {color:TH.textDim,fontSize:10},}, "(", opl.sign, ")")
-                            , React.createElement('span', { style: {marginLeft:"auto",color:TH.textDim,fontSize:10},}, a.orb, "°", a.exact?" exact":"")
-                            , React.createElement('span', { style: {color:TH.textDim,fontSize:10,transition:"transform 0.15s",transform:isAspOpen?"rotate(180deg)":"rotate(0deg)"},}, "▾")
-                          )
-                          , isAspOpen&&(
-                            React.createElement('div', { style: {padding:"4px 8px 10px",animation:"fadeIn 0.15s ease-out"},}
-                              , React.createElement('div', { style: {display:"flex",gap:8,marginBottom:8},}
-                                , React.createElement('div', { style: {flex:1,padding:"6px 8px",background:`${p.color}08`,borderRadius:6,fontSize:10},}
-                                  , React.createElement('span', { style: {color:p.color,fontWeight:600},}, p.sym, " " , p.name)
-                                  , React.createElement('div', { style: {color:TH.textDim},}, pl.sign, " " , pl.deg, " · H"  , pl.house)
-                                )
-                                , React.createElement('div', { style: {flex:1,padding:"6px 8px",background:`${_optionalChain([op, 'optionalAccess', _83 => _83.color])}08`,borderRadius:6,fontSize:10},}
-                                  , React.createElement('span', { style: {color:_optionalChain([op, 'optionalAccess', _84 => _84.color]),fontWeight:600},}, _optionalChain([op, 'optionalAccess', _85 => _85.sym]), " " , _optionalChain([op, 'optionalAccess', _86 => _86.name]))
-                                  , React.createElement('div', { style: {color:TH.textDim},}, _optionalChain([opl, 'optionalAccess', _87 => _87.sign]), " " , _optionalChain([opl, 'optionalAccess', _88 => _88.deg]), " · H"  , _optionalChain([opl, 'optionalAccess', _89 => _89.house]))
-                                )
-                              )
-                              , React.createElement('div', { style: {fontSize:12,color:TH.textMuted,lineHeight:1.7},}, interp)
-                            )
-                          )
-                        )
+                        <div key={i} style={{borderRadius:8,overflow:"hidden",border:`1px solid ${isAspOpen?a.asp.color+"30":"transparent"}`,marginBottom:3,background:isAspOpen?`${a.asp.color}06`:"transparent"}}>
+                          <div onClick={()=>setOpenAspect(isAspOpen?null:p.key+"-"+i)} style={{display:"flex",alignItems:"center",gap:5,fontSize:12,color:TH.textMuted,padding:"6px 8px",cursor:"pointer"}}>
+                            <span style={{color:a.asp.color,fontSize:14}}>{a.asp.sym}</span>
+                            <span style={{color:a.asp.color,fontWeight:600}}>{a.asp.name}</span>
+                            <span style={{color:op?.color}}>{op?.sym}</span>
+                            <span>{op?.name}</span>
+                            {opl&&<span style={{color:TH.textDim,fontSize:10}}>({opl.sign})</span>}
+                            <span style={{marginLeft:"auto",color:TH.textDim,fontSize:10}}>{a.orb}°{a.exact?" exact":""}</span>
+                            <span style={{color:TH.textDim,fontSize:10,transition:"transform 0.15s",transform:isAspOpen?"rotate(180deg)":"rotate(0deg)"}}>▾</span>
+                          </div>
+                          {isAspOpen&&(
+                            <div style={{padding:"4px 8px 10px",animation:"fadeIn 0.15s ease-out"}}>
+                              <div style={{display:"flex",gap:8,marginBottom:8}}>
+                                <div style={{flex:1,padding:"6px 8px",background:`${p.color}08`,borderRadius:6,fontSize:10}}>
+                                  <span style={{color:p.color,fontWeight:600}}>{p.sym} {p.name}</span>
+                                  <div style={{color:TH.textDim}}>{pl.sign} {pl.deg} · H{pl.house}</div>
+                                </div>
+                                <div style={{flex:1,padding:"6px 8px",background:`${op?.color}08`,borderRadius:6,fontSize:10}}>
+                                  <span style={{color:op?.color,fontWeight:600}}>{op?.sym} {op?.name}</span>
+                                  <div style={{color:TH.textDim}}>{opl?.sign} {opl?.deg} · H{opl?.house}</div>
+                                </div>
+                              </div>
+                              <div style={{fontSize:12,color:TH.textMuted,lineHeight:1.7}}>{interp}</div>
+                            </div>
+                          )}
+                        </div>
                       );
-                    })
-                  )
-                )
-              )
-            )
-          )
+                    })}
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
         );
-      })
-      , React.createElement('style', null, `@keyframes fadeIn{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:translateY(0)}}`)
-    )
+      })}
+      <style>{`@keyframes fadeIn{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:translateY(0)}}`}</style>
+    </div>
   );
 }
 
 function AspectsTab({chart,TH}){
   const [open,setOpen]=useState(null);
   return (
-    React.createElement('div', { style: {display:"flex",flexDirection:"column",gap:3,maxWidth:640},}
-      , chart.aspects.slice(0,35).map((a,i)=>{
+    <div style={{display:"flex",flexDirection:"column",gap:3,maxWidth:640}}>
+      {chart.aspects.slice(0,35).map((a,i)=>{
         const p1=PLANETS.find(p=>p.key===a.p1),p2=PLANETS.find(p=>p.key===a.p2);
         if(!p1||!p2) return null;
         const isOpen=open===i;
         const pl1=chart.pl[a.p1],pl2=chart.pl[a.p2];
         return (
-          React.createElement('div', { key: i, style: {borderRadius:8,overflow:"hidden",border:`1px solid ${isOpen?TH.cardBorder:"transparent"}`,background:isOpen?TH.bgCard:(a.exact?`${TH.accent}06`:"transparent"),transition:"all 0.15s"},}
-            , React.createElement('div', { onClick: ()=>setOpen(isOpen?null:i), style: {display:"flex",alignItems:"center",gap:6,padding:"8px 10px",cursor:"pointer",fontSize:12,fontFamily:FONT,color:TH.text},}
-              , React.createElement('span', { style: {color:p1.color,width:18,textAlign:"center",fontSize:15},}, p1.sym)
-              , React.createElement('span', { style: {color:TH.textMuted,width:55,fontSize:11},}, p1.name)
-              , React.createElement('span', { style: {color:a.asp.color,width:16,textAlign:"center",fontSize:16},}, a.asp.sym)
-              , React.createElement('span', { style: {color:a.asp.color,width:75,fontSize:11},}, a.asp.name)
-              , React.createElement('span', { style: {color:p2.color,width:18,textAlign:"center",fontSize:15},}, p2.sym)
-              , React.createElement('span', { style: {color:TH.textMuted,width:55,fontSize:11},}, p2.name)
-              , React.createElement('span', { style: {marginLeft:"auto",color:a.exact?TH.accent:TH.textDim,fontSize:10},}, a.orb, "°", a.exact?" exact":"")
-              , React.createElement('span', { style: {color:TH.textDim,fontSize:11,transition:"transform 0.2s",transform:isOpen?"rotate(180deg)":"rotate(0deg)"},}, "▾")
-            )
-            , isOpen&&(
-              React.createElement('div', { style: {padding:"0 10px 12px",animation:"fadeIn 0.15s ease-out"},}
-                , React.createElement('div', { style: {display:"flex",gap:16,marginBottom:8,marginTop:4},}
-                  , React.createElement('div', { style: {flex:1,padding:"8px 10px",background:`${p1.color}08`,borderRadius:6,fontSize:11},}
-                    , React.createElement('div', { style: {color:p1.color,fontWeight:600,marginBottom:2},}, p1.sym, " " , p1.name)
-                    , React.createElement('div', { style: {color:TH.textMuted},}, _optionalChain([pl1, 'optionalAccess', _90 => _90.sign]), " " , _optionalChain([pl1, 'optionalAccess', _91 => _91.deg]))
-                    , React.createElement('div', { style: {color:TH.textDim},}, "House " , _optionalChain([pl1, 'optionalAccess', _92 => _92.house]))
-                  )
-                  , React.createElement('div', { style: {flex:1,padding:"8px 10px",background:`${p2.color}08`,borderRadius:6,fontSize:11},}
-                    , React.createElement('div', { style: {color:p2.color,fontWeight:600,marginBottom:2},}, p2.sym, " " , p2.name)
-                    , React.createElement('div', { style: {color:TH.textMuted},}, _optionalChain([pl2, 'optionalAccess', _93 => _93.sign]), " " , _optionalChain([pl2, 'optionalAccess', _94 => _94.deg]))
-                    , React.createElement('div', { style: {color:TH.textDim},}, "House " , _optionalChain([pl2, 'optionalAccess', _95 => _95.house]))
-                  )
-                )
-                , React.createElement('div', { style: {fontSize:11,color:TH.textMuted,lineHeight:1.6},}, ASP_IX[a.asp.name]||"")
-                , React.createElement('div', { style: {fontSize:10,color:TH.textDim,marginTop:4},}, "Orb: " , a.orb, "° · Type: "   , a.asp.t)
-              )
-            )
-          )
+          <div key={i} style={{borderRadius:8,overflow:"hidden",border:`1px solid ${isOpen?TH.cardBorder:"transparent"}`,background:isOpen?TH.bgCard:(a.exact?`${TH.accent}06`:"transparent"),transition:"all 0.15s"}}>
+            <div onClick={()=>setOpen(isOpen?null:i)} style={{display:"flex",alignItems:"center",gap:6,padding:"8px 10px",cursor:"pointer",fontSize:12,fontFamily:FONT,color:TH.text}}>
+              <span style={{color:p1.color,width:18,textAlign:"center",fontSize:15}}>{p1.sym}</span>
+              <span style={{color:TH.textMuted,width:55,fontSize:11}}>{p1.name}</span>
+              <span style={{color:a.asp.color,width:16,textAlign:"center",fontSize:16}}>{a.asp.sym}</span>
+              <span style={{color:a.asp.color,width:75,fontSize:11}}>{a.asp.name}</span>
+              <span style={{color:p2.color,width:18,textAlign:"center",fontSize:15}}>{p2.sym}</span>
+              <span style={{color:TH.textMuted,width:55,fontSize:11}}>{p2.name}</span>
+              <span style={{marginLeft:"auto",color:a.exact?TH.accent:TH.textDim,fontSize:10}}>{a.orb}°{a.exact?" exact":""}</span>
+              <span style={{color:TH.textDim,fontSize:11,transition:"transform 0.2s",transform:isOpen?"rotate(180deg)":"rotate(0deg)"}}>▾</span>
+            </div>
+            {isOpen&&(
+              <div style={{padding:"0 10px 12px",animation:"fadeIn 0.15s ease-out"}}>
+                <div style={{display:"flex",gap:16,marginBottom:8,marginTop:4}}>
+                  <div style={{flex:1,padding:"8px 10px",background:`${p1.color}08`,borderRadius:6,fontSize:11}}>
+                    <div style={{color:p1.color,fontWeight:600,marginBottom:2}}>{p1.sym} {p1.name}</div>
+                    <div style={{color:TH.textMuted}}>{pl1?.sign} {pl1?.deg}</div>
+                    <div style={{color:TH.textDim}}>House {pl1?.house}</div>
+                  </div>
+                  <div style={{flex:1,padding:"8px 10px",background:`${p2.color}08`,borderRadius:6,fontSize:11}}>
+                    <div style={{color:p2.color,fontWeight:600,marginBottom:2}}>{p2.sym} {p2.name}</div>
+                    <div style={{color:TH.textMuted}}>{pl2?.sign} {pl2?.deg}</div>
+                    <div style={{color:TH.textDim}}>House {pl2?.house}</div>
+                  </div>
+                </div>
+                <div style={{fontSize:11,color:TH.textMuted,lineHeight:1.6}}>{ASP_IX[a.asp.name]||""}</div>
+                <div style={{fontSize:10,color:TH.textDim,marginTop:4}}>Orb: {a.orb}° · Type: {a.asp.t}</div>
+              </div>
+            )}
+          </div>
         );
-      })
-    )
+      })}
+    </div>
   );
 }
 
@@ -1262,104 +1186,104 @@ function PatternsTab({chart,TH}){
     "T-Square":"Two planets in opposition (180°) with a third squaring both (90°). The apex planet bears the most pressure and becomes the focal point for resolving the tension. One of the most dynamic and productive patterns — drives achievement through sustained effort and creative problem-solving."
   };
   if(!chart.patterns.length) return (
-    React.createElement('div', { style: {color:TH.textDim,fontSize:13,padding:20,background:TH.bgCard,borderRadius:12},}, "No major aspect patterns detected in this chart. Patterns like Grand Trines and T-Squares require specific geometric relationships between three or more planets."                      )
+    <div style={{color:TH.textDim,fontSize:13,padding:20,background:TH.bgCard,borderRadius:12}}>No major aspect patterns detected in this chart. Patterns like Grand Trines and T-Squares require specific geometric relationships between three or more planets.</div>
   );
   return (
-    React.createElement('div', { style: {display:"flex",flexDirection:"column",gap:6},}
-      , chart.patterns.map((p,i)=>{
+    <div style={{display:"flex",flexDirection:"column",gap:6}}>
+      {chart.patterns.map((p,i)=>{
         const isOpen=open===i;
         return (
-          React.createElement('div', { key: i, style: {background:`${p.color}${isOpen?"15":"08"}`,border:`1px solid ${p.color}${isOpen?"40":"25"}`,borderRadius:12,overflow:"hidden",transition:"all 0.2s"},}
-            , React.createElement('div', { onClick: ()=>setOpen(isOpen?null:i), style: {padding:"14px 16px",cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"space-between"},}
-              , React.createElement('div', null
-                , React.createElement('div', { style: {fontSize:14,fontWeight:600,color:p.color},}, p.name)
-                , React.createElement('div', { style: {fontSize:12,color:TH.textMuted,marginTop:2},}
-                  , p.planets.map(k=>_optionalChain([PLANETS, 'access', _96 => _96.find, 'call', _97 => _97(pl=>pl.key===k), 'optionalAccess', _98 => _98.name])||k).join(", ")
-                  , p.apex&&` · Apex: ${_optionalChain([PLANETS, 'access', _99 => _99.find, 'call', _100 => _100(pl=>pl.key===p.apex), 'optionalAccess', _101 => _101.name])}`
-                )
-              )
-              , React.createElement('span', { style: {color:p.color,fontSize:12,transition:"transform 0.2s",transform:isOpen?"rotate(180deg)":"rotate(0deg)"},}, "▾")
-            )
-            , isOpen&&(
-              React.createElement('div', { style: {padding:"0 16px 16px",animation:"fadeIn 0.15s ease-out"},}
-                , React.createElement('div', { style: {fontSize:12,color:TH.textMuted,lineHeight:1.7,marginBottom:10},}, PATTERN_IX[p.name]||"")
-                , React.createElement('div', { style: {fontSize:10,letterSpacing:1.5,color:TH.textDim,textTransform:"uppercase",marginBottom:6},}, "Planets Involved" )
-                , p.planets.map(k=>{const pp=PLANETS.find(pl=>pl.key===k);const pl=chart.pl[k];if(!pp||!pl) return null;
+          <div key={i} style={{background:`${p.color}${isOpen?"15":"08"}`,border:`1px solid ${p.color}${isOpen?"40":"25"}`,borderRadius:12,overflow:"hidden",transition:"all 0.2s"}}>
+            <div onClick={()=>setOpen(isOpen?null:i)} style={{padding:"14px 16px",cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"space-between"}}>
+              <div>
+                <div style={{fontSize:14,fontWeight:600,color:p.color}}>{p.name}</div>
+                <div style={{fontSize:12,color:TH.textMuted,marginTop:2}}>
+                  {p.planets.map(k=>PLANETS.find(pl=>pl.key===k)?.name||k).join(", ")}
+                  {p.apex&&` · Apex: ${PLANETS.find(pl=>pl.key===p.apex)?.name}`}
+                </div>
+              </div>
+              <span style={{color:p.color,fontSize:12,transition:"transform 0.2s",transform:isOpen?"rotate(180deg)":"rotate(0deg)"}}>▾</span>
+            </div>
+            {isOpen&&(
+              <div style={{padding:"0 16px 16px",animation:"fadeIn 0.15s ease-out"}}>
+                <div style={{fontSize:12,color:TH.textMuted,lineHeight:1.7,marginBottom:10}}>{PATTERN_IX[p.name]||""}</div>
+                <div style={{fontSize:10,letterSpacing:1.5,color:TH.textDim,textTransform:"uppercase",marginBottom:6}}>Planets Involved</div>
+                {p.planets.map(k=>{const pp=PLANETS.find(pl=>pl.key===k);const pl=chart.pl[k];if(!pp||!pl) return null;
                   return (
-                    React.createElement('div', { key: k, style: {display:"flex",alignItems:"center",gap:8,padding:"6px 10px",background:TH.bgCard,borderRadius:6,marginBottom:4,fontSize:12},}
-                      , React.createElement('span', { style: {color:pp.color,fontSize:16},}, pp.sym)
-                      , React.createElement('span', { style: {color:TH.text,fontWeight:600},}, pp.name)
-                      , React.createElement('span', { style: {color:pl.signColor},}, pl.signSym)
-                      , React.createElement('span', { style: {color:TH.textMuted},}, pl.sign, " " , pl.deg)
-                      , React.createElement('span', { style: {marginLeft:"auto",color:TH.textDim,fontSize:10},}, "H", pl.house)
-                      , k===p.apex&&React.createElement('span', { style: {color:p.color,fontSize:9,padding:"1px 5px",background:`${p.color}20`,borderRadius:4},}, "APEX")
-                    )
+                    <div key={k} style={{display:"flex",alignItems:"center",gap:8,padding:"6px 10px",background:TH.bgCard,borderRadius:6,marginBottom:4,fontSize:12}}>
+                      <span style={{color:pp.color,fontSize:16}}>{pp.sym}</span>
+                      <span style={{color:TH.text,fontWeight:600}}>{pp.name}</span>
+                      <span style={{color:pl.signColor}}>{pl.signSym}</span>
+                      <span style={{color:TH.textMuted}}>{pl.sign} {pl.deg}</span>
+                      <span style={{marginLeft:"auto",color:TH.textDim,fontSize:10}}>H{pl.house}</span>
+                      {k===p.apex&&<span style={{color:p.color,fontSize:9,padding:"1px 5px",background:`${p.color}20`,borderRadius:4}}>APEX</span>}
+                    </div>
                   );
-                })
-                /* Show the aspects that form this pattern */
-                , React.createElement('div', { style: {fontSize:10,letterSpacing:1.5,color:TH.textDim,textTransform:"uppercase",marginTop:8,marginBottom:4},}, "Forming Aspects" )
-                , chart.aspects.filter(a=>p.planets.includes(a.p1)&&p.planets.includes(a.p2)).map((a,j)=>{
+                })}
+                {/* Show the aspects that form this pattern */}
+                <div style={{fontSize:10,letterSpacing:1.5,color:TH.textDim,textTransform:"uppercase",marginTop:8,marginBottom:4}}>Forming Aspects</div>
+                {chart.aspects.filter(a=>p.planets.includes(a.p1)&&p.planets.includes(a.p2)).map((a,j)=>{
                   const pp1=PLANETS.find(x=>x.key===a.p1),pp2=PLANETS.find(x=>x.key===a.p2);
                   return (
-                    React.createElement('div', { key: j, style: {display:"flex",alignItems:"center",gap:5,fontSize:11,color:TH.textMuted,padding:"2px 0"},}
-                      , React.createElement('span', { style: {color:_optionalChain([pp1, 'optionalAccess', _102 => _102.color])},}, _optionalChain([pp1, 'optionalAccess', _103 => _103.sym]))
-                      , React.createElement('span', { style: {color:a.asp.color},}, a.asp.sym, " " , a.asp.name)
-                      , React.createElement('span', { style: {color:_optionalChain([pp2, 'optionalAccess', _104 => _104.color])},}, _optionalChain([pp2, 'optionalAccess', _105 => _105.sym]), " " , _optionalChain([pp2, 'optionalAccess', _106 => _106.name]))
-                      , React.createElement('span', { style: {marginLeft:"auto",color:TH.textDim},}, a.orb, "°")
-                    )
+                    <div key={j} style={{display:"flex",alignItems:"center",gap:5,fontSize:11,color:TH.textMuted,padding:"2px 0"}}>
+                      <span style={{color:pp1?.color}}>{pp1?.sym}</span>
+                      <span style={{color:a.asp.color}}>{a.asp.sym} {a.asp.name}</span>
+                      <span style={{color:pp2?.color}}>{pp2?.sym} {pp2?.name}</span>
+                      <span style={{marginLeft:"auto",color:TH.textDim}}>{a.orb}°</span>
+                    </div>
                   );
-                })
-              )
-            )
-          )
+                })}
+              </div>
+            )}
+          </div>
         );
-      })
-    )
+      })}
+    </div>
   );
 }
 
 function HousesTab({chart,TH}){
   const [open,setOpen]=useState(null);
   return (
-    React.createElement('div', { style: {display:"flex",flexDirection:"column",gap:4},}
-      , chart.houses.map((d,i)=>{
-        const sg=getSign(d),pls=PLANETS.filter(p=>_optionalChain([chart, 'access', _107 => _107.pl, 'access', _108 => _108[p.key], 'optionalAccess', _109 => _109.house])===i+1);
+    <div style={{display:"flex",flexDirection:"column",gap:4}}>
+      {chart.houses.map((d,i)=>{
+        const sg=getSign(d),pls=PLANETS.filter(p=>chart.pl[p.key]?.house===i+1);
         const isOpen=open===i;
         return (
-          React.createElement('div', { key: i, style: {background:isOpen?TH.bgCard:"transparent",border:`1px solid ${isOpen?TH.cardBorder:TH.borderLight}`,borderRadius:12,overflow:"hidden",transition:"all 0.15s"},}
-            , React.createElement('div', { onClick: ()=>setOpen(isOpen?null:i), style: {display:"flex",alignItems:"center",gap:10,padding:"12px 16px",cursor:"pointer"},}
-              , React.createElement('span', { style: {fontFamily:FONT_D,fontSize:18,color:TH.lavender,width:70},}, "House " , i+1)
-              , React.createElement('span', { style: {fontSize:12,color:sg.c},}, sg.s, " " , sg.n)
-              , React.createElement('span', { style: {fontSize:10,color:TH.textDim},}, fmtDeg(d))
-              , pls.length>0&&React.createElement('div', { style: {display:"flex",gap:2,marginLeft:"auto"},}, pls.map(p=> (React.createElement('span', { key: p.key, style: {color:p.color,fontSize:14},}, p.sym))))
-              , React.createElement('span', { style: {color:TH.textDim,fontSize:11,marginLeft:pls.length?4:"auto",transition:"transform 0.2s",transform:isOpen?"rotate(180deg)":"rotate(0deg)"},}, "▾")
-            )
-            , isOpen&&(
-              React.createElement('div', { style: {padding:"0 16px 16px",animation:"fadeIn 0.15s ease-out"},}
-                , React.createElement('div', { style: {fontSize:12,color:TH.textMuted,lineHeight:1.7,marginBottom:10},}, HOUSE_IX[i+1])
-                , pls.length>0?(
-                  React.createElement('div', null
-                    , React.createElement('div', { style: {fontSize:10,letterSpacing:1.5,color:TH.textDim,textTransform:"uppercase",marginBottom:6},}, "Planets in this house"   )
-                    , pls.map(p=>{const pl=chart.pl[p.key];const dig=getDignity(p.name,_optionalChain([pl, 'optionalAccess', _110 => _110.sign]));return (
-                      React.createElement('div', { key: p.key, style: {display:"flex",alignItems:"center",gap:8,padding:"6px 10px",background:`${p.color}08`,borderRadius:6,marginBottom:4,fontSize:12},}
-                        , React.createElement('span', { style: {color:p.color,fontSize:16},}, p.sym)
-                        , React.createElement('span', { style: {color:TH.text,fontWeight:600},}, p.name)
-                        , React.createElement('span', { style: {color:_optionalChain([pl, 'optionalAccess', _111 => _111.signColor])},}, _optionalChain([pl, 'optionalAccess', _112 => _112.signSym]))
-                        , React.createElement('span', { style: {color:TH.textMuted},}, _optionalChain([pl, 'optionalAccess', _113 => _113.sign]), " " , _optionalChain([pl, 'optionalAccess', _114 => _114.deg]))
-                        , dig&&React.createElement('span', { style: {marginLeft:"auto",color:dig.color,fontSize:9},}, dig.icon)
-                        , _optionalChain([pl, 'optionalAccess', _115 => _115.rx])&&React.createElement('span', { style: {color:TH.rose,fontSize:10},}, "℞")
-                      )
-                    )})
-                  )
+          <div key={i} style={{background:isOpen?TH.bgCard:"transparent",border:`1px solid ${isOpen?TH.cardBorder:TH.borderLight}`,borderRadius:12,overflow:"hidden",transition:"all 0.15s"}}>
+            <div onClick={()=>setOpen(isOpen?null:i)} style={{display:"flex",alignItems:"center",gap:10,padding:"12px 16px",cursor:"pointer"}}>
+              <span style={{fontFamily:FONT_D,fontSize:18,color:TH.lavender,width:70}}>House {i+1}</span>
+              <span style={{fontSize:12,color:sg.c}}>{sg.s} {sg.n}</span>
+              <span style={{fontSize:10,color:TH.textDim}}>{fmtDeg(d)}</span>
+              {pls.length>0&&<div style={{display:"flex",gap:2,marginLeft:"auto"}}>{pls.map(p=> (<span key={p.key} style={{color:p.color,fontSize:14}}>{p.sym}</span>))}</div>}
+              <span style={{color:TH.textDim,fontSize:11,marginLeft:pls.length?4:"auto",transition:"transform 0.2s",transform:isOpen?"rotate(180deg)":"rotate(0deg)"}}>▾</span>
+            </div>
+            {isOpen&&(
+              <div style={{padding:"0 16px 16px",animation:"fadeIn 0.15s ease-out"}}>
+                <div style={{fontSize:12,color:TH.textMuted,lineHeight:1.7,marginBottom:10}}>{HOUSE_IX[i+1]}</div>
+                {pls.length>0?(
+                  <div>
+                    <div style={{fontSize:10,letterSpacing:1.5,color:TH.textDim,textTransform:"uppercase",marginBottom:6}}>Planets in this house</div>
+                    {pls.map(p=>{const pl=chart.pl[p.key];const dig=getDignity(p.name,pl?.sign);return (
+                      <div key={p.key} style={{display:"flex",alignItems:"center",gap:8,padding:"6px 10px",background:`${p.color}08`,borderRadius:6,marginBottom:4,fontSize:12}}>
+                        <span style={{color:p.color,fontSize:16}}>{p.sym}</span>
+                        <span style={{color:TH.text,fontWeight:600}}>{p.name}</span>
+                        <span style={{color:pl?.signColor}}>{pl?.signSym}</span>
+                        <span style={{color:TH.textMuted}}>{pl?.sign} {pl?.deg}</span>
+                        {dig&&<span style={{marginLeft:"auto",color:dig.color,fontSize:9}}>{dig.icon}</span>}
+                        {pl?.rx&&<span style={{color:TH.rose,fontSize:10}}>℞</span>}
+                      </div>
+                    )})}
+                  </div>
                 ):(
-                  React.createElement('div', { style: {fontSize:11,color:TH.textDim,fontStyle:"italic"},}, "No planets in this house"    )
-                )
-              )
-            )
-          )
+                  <div style={{fontSize:11,color:TH.textDim,fontStyle:"italic"}}>No planets in this house</div>
+                )}
+              </div>
+            )}
+          </div>
         );
-      })
-    )
+      })}
+    </div>
   );
 }
 
@@ -1372,47 +1296,47 @@ function DignityTab({chart,TH}){
     Fall:"The planet is in the sign opposite its exaltation — diminished and struggling. Its energy is weakened, requiring extra effort and consciousness to express constructively."
   };
   return (
-    React.createElement('div', { style: {display:"flex",flexDirection:"column",gap:4,maxWidth:540},}
-      , React.createElement('div', { style: {fontSize:10,letterSpacing:2,color:TH.textDim,textTransform:"uppercase",marginBottom:4},}, "Essential Dignities & Debilities"   )
-      , PLANETS.slice(0,7).map(p=>{const pl=chart.pl[p.key];if(!pl) return null;
+    <div style={{display:"flex",flexDirection:"column",gap:4,maxWidth:540}}>
+      <div style={{fontSize:10,letterSpacing:2,color:TH.textDim,textTransform:"uppercase",marginBottom:4}}>Essential Dignities & Debilities</div>
+      {PLANETS.slice(0,7).map(p=>{const pl=chart.pl[p.key];if(!pl) return null;
         const dig=getDignity(p.name,pl.sign);
         const isOpen=open===p.key;
         return (
-          React.createElement('div', { key: p.key, style: {borderRadius:8,overflow:"hidden",border:`1px solid ${isOpen?(dig?dig.color+"40":TH.border):(dig?dig.color+"20":TH.borderLight)}`,background:isOpen?(dig?`${dig.color}10`:TH.bgCard):(dig?`${dig.color}06`:"transparent"),transition:"all 0.15s"},}
-            , React.createElement('div', { onClick: ()=>setOpen(isOpen?null:p.key), style: {display:"flex",alignItems:"center",gap:10,padding:"10px 14px",cursor:"pointer"},}
-              , React.createElement('span', { style: {color:p.color,fontSize:18},}, p.sym)
-              , React.createElement('span', { style: {width:65,fontSize:13,color:TH.text,fontWeight:600},}, p.name)
-              , React.createElement('span', { style: {color:pl.signColor},}, pl.signSym)
-              , React.createElement('span', { style: {fontSize:12,color:TH.textMuted},}, "in " , pl.sign)
-              , dig?React.createElement('span', { style: {color:dig.color,fontSize:12,fontWeight:600,marginLeft:"auto"},}, dig.icon, " " , dig.type):React.createElement('span', { style: {color:TH.textDim,fontSize:11,marginLeft:"auto"},}, "Peregrine")
-              , React.createElement('span', { style: {color:TH.textDim,fontSize:11,marginLeft:6,transition:"transform 0.2s",transform:isOpen?"rotate(180deg)":"rotate(0deg)"},}, "▾")
-            )
-            , isOpen&&(
-              React.createElement('div', { style: {padding:"0 14px 14px",animation:"fadeIn 0.15s ease-out"},}
-                , dig?(
-                  React.createElement('div', { style: {fontSize:12,color:TH.textMuted,lineHeight:1.7},}, DIG_IX[dig.type]||"")
+          <div key={p.key} style={{borderRadius:8,overflow:"hidden",border:`1px solid ${isOpen?(dig?dig.color+"40":TH.border):(dig?dig.color+"20":TH.borderLight)}`,background:isOpen?(dig?`${dig.color}10`:TH.bgCard):(dig?`${dig.color}06`:"transparent"),transition:"all 0.15s"}}>
+            <div onClick={()=>setOpen(isOpen?null:p.key)} style={{display:"flex",alignItems:"center",gap:10,padding:"10px 14px",cursor:"pointer"}}>
+              <span style={{color:p.color,fontSize:18}}>{p.sym}</span>
+              <span style={{width:65,fontSize:13,color:TH.text,fontWeight:600}}>{p.name}</span>
+              <span style={{color:pl.signColor}}>{pl.signSym}</span>
+              <span style={{fontSize:12,color:TH.textMuted}}>in {pl.sign}</span>
+              {dig?<span style={{color:dig.color,fontSize:12,fontWeight:600,marginLeft:"auto"}}>{dig.icon} {dig.type}</span>:<span style={{color:TH.textDim,fontSize:11,marginLeft:"auto"}}>Peregrine</span>}
+              <span style={{color:TH.textDim,fontSize:11,marginLeft:6,transition:"transform 0.2s",transform:isOpen?"rotate(180deg)":"rotate(0deg)"}}>▾</span>
+            </div>
+            {isOpen&&(
+              <div style={{padding:"0 14px 14px",animation:"fadeIn 0.15s ease-out"}}>
+                {dig?(
+                  <div style={{fontSize:12,color:TH.textMuted,lineHeight:1.7}}>{DIG_IX[dig.type]||""}</div>
                 ):(
-                  React.createElement('div', { style: {fontSize:12,color:TH.textMuted,lineHeight:1.7},}, "This planet has no essential dignity or debility in "         , pl.sign, " — it operates as a \"guest\" with neither special advantage nor disadvantage. Expression depends more on aspects and house placement."                    )
-                )
-                , React.createElement('div', { style: {marginTop:8,padding:"8px 10px",background:TH.bgCard,borderRadius:6,fontSize:11},}
-                  , React.createElement('div', { style: {color:TH.textDim,marginBottom:4},}, "Dignity Table for "   , p.name, ":")
-                  , DIGNITIES[p.name]?(
-                    React.createElement('div', { style: {display:"grid",gridTemplateColumns:"1fr 1fr",gap:2},}
-                      , React.createElement('span', { style: {color:"#6ee7b7"},}, "🏠 Domicile: "  , DIGNITIES[p.name].dom)
-                      , React.createElement('span', { style: {color:"#fbbf24"},}, "⬆ Exalted: "  , DIGNITIES[p.name].exalt)
-                      , React.createElement('span', { style: {color:"#ef4444"},}, "⬇ Detriment: "  , DIGNITIES[p.name].det)
-                      , React.createElement('span', { style: {color:"#b91c1c"},}, "↓ Fall: "  , DIGNITIES[p.name].fall)
-                    )
+                  <div style={{fontSize:12,color:TH.textMuted,lineHeight:1.7}}>This planet has no essential dignity or debility in {pl.sign} — it operates as a "guest" with neither special advantage nor disadvantage. Expression depends more on aspects and house placement.</div>
+                )}
+                <div style={{marginTop:8,padding:"8px 10px",background:TH.bgCard,borderRadius:6,fontSize:11}}>
+                  <div style={{color:TH.textDim,marginBottom:4}}>Dignity Table for {p.name}:</div>
+                  {DIGNITIES[p.name]?(
+                    <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:2}}>
+                      <span style={{color:"#6ee7b7"}}>🏠 Domicile: {DIGNITIES[p.name].dom}</span>
+                      <span style={{color:"#fbbf24"}}>⬆ Exalted: {DIGNITIES[p.name].exalt}</span>
+                      <span style={{color:"#ef4444"}}>⬇ Detriment: {DIGNITIES[p.name].det}</span>
+                      <span style={{color:"#b91c1c"}}>↓ Fall: {DIGNITIES[p.name].fall}</span>
+                    </div>
                   ):(
-                    React.createElement('div', { style: {color:TH.textDim},}, "No traditional dignities assigned to "     , p.name, ".")
-                  )
-                )
-              )
-            )
-          )
+                    <div style={{color:TH.textDim}}>No traditional dignities assigned to {p.name}.</div>
+                  )}
+                </div>
+              </div>
+            )}
+          </div>
         );
-      })
-    )
+      })}
+    </div>
   );
 }
 
@@ -1503,7 +1427,7 @@ const SPECIAL_IX = {
 function getTransitReading(tBody, aspect, nPoint, tSign, isRet) {
   const spKey = `${tBody}-${aspect.name}-${nPoint}`;
   if (SPECIAL_IX[spKey]) return { isSpecial: true, body: SPECIAL_IX[spKey] };
-  const taText = _optionalChain([TA_IX, 'access', _116 => _116[tBody], 'optionalAccess', _117 => _117[aspect.name]]);
+  const taText = TA_IX[tBody]?.[aspect.name];
   const nrText = NR_IX[nPoint] || "this area of your chart";
   let body = "";
   if (taText) {
@@ -1601,74 +1525,74 @@ function CareerTab({chart,TH}){
   const h2Ruler=rulerMap[h2Sign.ruler];const h2RulerPl=chart.pl[h2Ruler];
   const h10Ruler=rulerMap[mcSign.ruler];const h10RulerPl=chart.pl[h10Ruler];
 
-  const planetsInH2=PLANETS.filter(p=>_optionalChain([chart, 'access', _118 => _118.pl, 'access', _119 => _119[p.key], 'optionalAccess', _120 => _120.house])===2);
-  const planetsInH6=PLANETS.filter(p=>_optionalChain([chart, 'access', _121 => _121.pl, 'access', _122 => _122[p.key], 'optionalAccess', _123 => _123.house])===6);
-  const planetsInH8=PLANETS.filter(p=>_optionalChain([chart, 'access', _124 => _124.pl, 'access', _125 => _125[p.key], 'optionalAccess', _126 => _126.house])===8);
-  const planetsInH10=PLANETS.filter(p=>_optionalChain([chart, 'access', _127 => _127.pl, 'access', _128 => _128[p.key], 'optionalAccess', _129 => _129.house])===10);
+  const planetsInH2=PLANETS.filter(p=>chart.pl[p.key]?.house===2);
+  const planetsInH6=PLANETS.filter(p=>chart.pl[p.key]?.house===6);
+  const planetsInH8=PLANETS.filter(p=>chart.pl[p.key]?.house===8);
+  const planetsInH10=PLANETS.filter(p=>chart.pl[p.key]?.house===10);
 
   // Key career planets
   const saturn=chart.pl.saturn;const jupiter=chart.pl.jupiter;const venus=chart.pl.venus;const mars=chart.pl.mars;const sun=chart.pl.sun;
 
   const sections=[
-    {id:"mc",icon:"⬆",color:TH.accent,title:"Midheaven (MC) — Your Career Path",sub:`${mcSign.s} ${mcSign.n} ${fmtDeg(chart.mc)}`,content:CAREER_IX.mc[mcSign.n]||"Your MC sign shapes your public persona and career direction.",extra:()=>(React.createElement('div', null
-      , React.createElement('div', { style: {fontSize:11,color:TH.textDim,marginTop:8},}, "MC Ruler: "  , React.createElement('span', { style: {color:_optionalChain([h10RulerPl, 'optionalAccess', _130 => _130.signColor])},}, mcSign.ruler), " in "  , _optionalChain([h10RulerPl, 'optionalAccess', _131 => _131.sign]), " (H" , _optionalChain([h10RulerPl, 'optionalAccess', _132 => _132.house]), ")")
-      , React.createElement('div', { style: {fontSize:11,color:TH.textMuted,marginTop:4,lineHeight:1.6},}, "The ruler of your MC in House "       , _optionalChain([h10RulerPl, 'optionalAccess', _133 => _133.house]), " suggests your career success flows through the themes of that house — "             , HOUSE_IX[_optionalChain([h10RulerPl, 'optionalAccess', _134 => _134.house])], ".")
-      , planetsInH10.length>0&&React.createElement('div', { style: {marginTop:8},}, React.createElement('div', { style: {fontSize:10,letterSpacing:1.5,color:TH.textDim,textTransform:"uppercase",marginBottom:4},}, "Planets in 10th House"   ), planetsInH10.map(p=>{const pl=chart.pl[p.key];return(React.createElement('div', { key: p.key, style: {display:"flex",alignItems:"center",gap:6,fontSize:12,color:TH.textMuted,padding:"4px 8px",background:`${p.color}08`,borderRadius:6,marginBottom:3},}, React.createElement('span', { style: {color:p.color,fontSize:16},}, p.sym), React.createElement('span', { style: {color:TH.text,fontWeight:600},}, p.name), React.createElement('span', null, "in " , _optionalChain([pl, 'optionalAccess', _135 => _135.sign]))))}))
-    ))},
-    {id:"h2",icon:"💰",color:"#fbbf24",title:"2nd House — Earned Income & Self-Worth",sub:`${h2Sign.s} ${h2Sign.n} ${fmtDeg(h2cusp)}`,content:`Your 2nd house in ${h2Sign.n} (ruled by ${h2Sign.ruler}) shapes how you earn and relate to money. ${h2Sign.el==="Fire"?"You earn through boldness, initiative, and personal energy.":h2Sign.el==="Earth"?"You earn through practical skills, patience, and tangible results.":h2Sign.el==="Air"?"You earn through ideas, communication, and social connections.":"You earn through intuition, emotional intelligence, and creative depth."}`,extra:()=>(React.createElement('div', null
-      , React.createElement('div', { style: {fontSize:11,color:TH.textDim,marginTop:8},}, "2nd House Ruler: "   , React.createElement('span', { style: {color:_optionalChain([h2RulerPl, 'optionalAccess', _136 => _136.signColor])},}, h2Sign.ruler), " in "  , _optionalChain([h2RulerPl, 'optionalAccess', _137 => _137.sign]), " (H" , _optionalChain([h2RulerPl, 'optionalAccess', _138 => _138.house]), ")")
-      , planetsInH2.length>0?React.createElement('div', { style: {marginTop:8},}, React.createElement('div', { style: {fontSize:10,letterSpacing:1.5,color:TH.textDim,textTransform:"uppercase",marginBottom:4},}, "Planets in 2nd House"   ), planetsInH2.map(p=>{const pl=chart.pl[p.key];return(React.createElement('div', { key: p.key, style: {display:"flex",alignItems:"center",gap:6,fontSize:12,color:TH.textMuted,padding:"4px 8px",background:`${p.color}08`,borderRadius:6,marginBottom:3},}, React.createElement('span', { style: {color:p.color,fontSize:16},}, p.sym), React.createElement('span', { style: {color:TH.text,fontWeight:600},}, p.name), React.createElement('span', null, "in " , _optionalChain([pl, 'optionalAccess', _139 => _139.sign]))))})):React.createElement('div', { style: {fontSize:11,color:TH.textDim,marginTop:8,fontStyle:"italic"},}, "No planets in the 2nd house — the ruler's condition tells the financial story."             )
-    ))},
-    {id:"h6",icon:"⚒",color:"#6ee7b7",title:"6th House — Daily Work & Service",sub:`${h6Sign.s} ${h6Sign.n} ${fmtDeg(h6cusp)}`,content:`Your 6th house in ${h6Sign.n} describes your daily work habits and service orientation. ${h6Sign.mod==="Cardinal"?"You initiate and lead in daily work.":h6Sign.mod==="Fixed"?"You're steady and persistent in routines.":"You're adaptable and versatile in your work approach."}`,extra:()=>(React.createElement('div', null
-      , planetsInH6.length>0?React.createElement('div', { style: {marginTop:8},}, React.createElement('div', { style: {fontSize:10,letterSpacing:1.5,color:TH.textDim,textTransform:"uppercase",marginBottom:4},}, "Planets in 6th House"   ), planetsInH6.map(p=>{const pl=chart.pl[p.key];return(React.createElement('div', { key: p.key, style: {display:"flex",alignItems:"center",gap:6,fontSize:12,color:TH.textMuted,padding:"4px 8px",background:`${p.color}08`,borderRadius:6,marginBottom:3},}, React.createElement('span', { style: {color:p.color,fontSize:16},}, p.sym), React.createElement('span', { style: {color:TH.text,fontWeight:600},}, p.name), React.createElement('span', null, "in " , _optionalChain([pl, 'optionalAccess', _140 => _140.sign]))))})):React.createElement('div', { style: {fontSize:11,color:TH.textDim,marginTop:8,fontStyle:"italic"},}, "No planets in the 6th house — work routines shaped primarily by the cusp sign."              )
-    ))},
-    {id:"h8",icon:"🔄",color:"#f0abfc",title:"8th House — Shared Resources & Investments",sub:`${h8Sign.s} ${h8Sign.n} ${fmtDeg(h8cusp)}`,content:`Your 8th house in ${h8Sign.n} governs shared finances, investments, inheritance, taxes, and debt. This is "other people's money" — financial partnerships, joint ventures, and transformative financial events.`,extra:()=>(React.createElement('div', null
-      , planetsInH8.length>0?React.createElement('div', { style: {marginTop:8},}, React.createElement('div', { style: {fontSize:10,letterSpacing:1.5,color:TH.textDim,textTransform:"uppercase",marginBottom:4},}, "Planets in 8th House"   ), planetsInH8.map(p=>{const pl=chart.pl[p.key];return(React.createElement('div', { key: p.key, style: {display:"flex",alignItems:"center",gap:6,fontSize:12,color:TH.textMuted,padding:"4px 8px",background:`${p.color}08`,borderRadius:6,marginBottom:3},}, React.createElement('span', { style: {color:p.color,fontSize:16},}, p.sym), React.createElement('span', { style: {color:TH.text,fontWeight:600},}, p.name), React.createElement('span', null, "in " , _optionalChain([pl, 'optionalAccess', _141 => _141.sign]))))})):React.createElement('div', { style: {fontSize:11,color:TH.textDim,marginTop:8,fontStyle:"italic"},}, "No planets in the 8th house — shared finances develop through the cusp ruler's condition."              )
-    ))},
-    {id:"saturn",icon:"♄",color:"#78716c",title:"Saturn — Career Authority & Discipline",sub:`${_optionalChain([saturn, 'optionalAccess', _142 => _142.signSym])} ${_optionalChain([saturn, 'optionalAccess', _143 => _143.sign])} ${_optionalChain([saturn, 'optionalAccess', _144 => _144.deg])} · House ${_optionalChain([saturn, 'optionalAccess', _145 => _145.house])}`,content:`Saturn in ${_optionalChain([saturn, 'optionalAccess', _146 => _146.sign])} (House ${_optionalChain([saturn, 'optionalAccess', _147 => _147.house])}) shows where you build professional mastery through patience, discipline, and earned authority. Saturn's house is where you face your biggest challenges — and ultimately build your most enduring legacy. ${_optionalChain([saturn, 'optionalAccess', _148 => _148.house])===10?"Saturn in the 10th house is the classic 'CEO placement' — career defines your life journey.":_optionalChain([saturn, 'optionalAccess', _149 => _149.house])===2?"Saturn in the 2nd demands financial discipline — wealth comes slowly but solidly.":_optionalChain([saturn, 'optionalAccess', _150 => _150.house])===6?"Saturn in the 6th house makes you a meticulous, dedicated worker who earns respect through reliability.":"Saturn here channels discipline into the "+_optionalChain([HOUSE_IX, 'access', _151 => _151[_optionalChain([saturn, 'optionalAccess', _152 => _152.house])], 'optionalAccess', _153 => _153.split, 'call', _154 => _154(","), 'access', _155 => _155[0]])+" domain."}`},
-    {id:"jupiter",icon:"♃",color:"#818cf8",title:"Jupiter — Expansion & Abundance",sub:`${_optionalChain([jupiter, 'optionalAccess', _156 => _156.signSym])} ${_optionalChain([jupiter, 'optionalAccess', _157 => _157.sign])} ${_optionalChain([jupiter, 'optionalAccess', _158 => _158.deg])} · House ${_optionalChain([jupiter, 'optionalAccess', _159 => _159.house])}`,content:`Jupiter in ${_optionalChain([jupiter, 'optionalAccess', _160 => _160.sign])} (House ${_optionalChain([jupiter, 'optionalAccess', _161 => _161.house])}) reveals where financial and professional growth comes most naturally. This is your area of luck, expansion, and opportunity. ${_optionalChain([jupiter, 'optionalAccess', _162 => _162.house])===2?"Jupiter in the 2nd house is one of the strongest wealth indicators — natural financial abundance.":_optionalChain([jupiter, 'optionalAccess', _163 => _163.house])===10?"Jupiter in the 10th blesses your career with expansion, recognition, and high-profile opportunities.":_optionalChain([jupiter, 'optionalAccess', _164 => _164.house])===8?"Jupiter in the 8th can indicate significant wealth through investments, inheritance, or partnerships.":"Jupiter here brings growth and abundance through "+_optionalChain([HOUSE_IX, 'access', _165 => _165[_optionalChain([jupiter, 'optionalAccess', _166 => _166.house])], 'optionalAccess', _167 => _167.split, 'call', _168 => _168(","), 'access', _169 => _169[0]])+"."}`},
-    {id:"venus",icon:"♀",color:"#f0abfc",title:"Venus — What You Attract & Value",sub:`${_optionalChain([venus, 'optionalAccess', _170 => _170.signSym])} ${_optionalChain([venus, 'optionalAccess', _171 => _171.sign])} ${_optionalChain([venus, 'optionalAccess', _172 => _172.deg])} · House ${_optionalChain([venus, 'optionalAccess', _173 => _173.house])}`,content:`Venus in ${_optionalChain([venus, 'optionalAccess', _174 => _174.sign])} (House ${_optionalChain([venus, 'optionalAccess', _175 => _175.house])}) shows your earning style and relationship with material comfort. Venus attracts resources through beauty, charm, diplomacy, and the things you genuinely value. ${_optionalChain([venus, 'optionalAccess', _176 => _176.house])===2?"Venus in the 2nd house is excellent for finances — you naturally attract money and value comfort.":_optionalChain([venus, 'optionalAccess', _177 => _177.house])===10?"Venus in the 10th makes your career charming, artistic, or relationship-oriented.":"Venus here draws resources through "+_optionalChain([HOUSE_IX, 'access', _178 => _178[_optionalChain([venus, 'optionalAccess', _179 => _179.house])], 'optionalAccess', _180 => _180.split, 'call', _181 => _181(","), 'access', _182 => _182[0]])+"."}`},
+    {id:"mc",icon:"⬆",color:TH.accent,title:"Midheaven (MC) — Your Career Path",sub:`${mcSign.s} ${mcSign.n} ${fmtDeg(chart.mc)}`,content:CAREER_IX.mc[mcSign.n]||"Your MC sign shapes your public persona and career direction.",extra:()=>(<div>
+      <div style={{fontSize:11,color:TH.textDim,marginTop:8}}>MC Ruler: <span style={{color:h10RulerPl?.signColor}}>{mcSign.ruler}</span> in {h10RulerPl?.sign} (H{h10RulerPl?.house})</div>
+      <div style={{fontSize:11,color:TH.textMuted,marginTop:4,lineHeight:1.6}}>The ruler of your MC in House {h10RulerPl?.house} suggests your career success flows through the themes of that house — {HOUSE_IX[h10RulerPl?.house]}.</div>
+      {planetsInH10.length>0&&<div style={{marginTop:8}}><div style={{fontSize:10,letterSpacing:1.5,color:TH.textDim,textTransform:"uppercase",marginBottom:4}}>Planets in 10th House</div>{planetsInH10.map(p=>{const pl=chart.pl[p.key];return(<div key={p.key} style={{display:"flex",alignItems:"center",gap:6,fontSize:12,color:TH.textMuted,padding:"4px 8px",background:`${p.color}08`,borderRadius:6,marginBottom:3}}><span style={{color:p.color,fontSize:16}}>{p.sym}</span><span style={{color:TH.text,fontWeight:600}}>{p.name}</span><span>in {pl?.sign}</span></div>)})}</div>}
+    </div>)},
+    {id:"h2",icon:"💰",color:"#fbbf24",title:"2nd House — Earned Income & Self-Worth",sub:`${h2Sign.s} ${h2Sign.n} ${fmtDeg(h2cusp)}`,content:`Your 2nd house in ${h2Sign.n} (ruled by ${h2Sign.ruler}) shapes how you earn and relate to money. ${h2Sign.el==="Fire"?"You earn through boldness, initiative, and personal energy.":h2Sign.el==="Earth"?"You earn through practical skills, patience, and tangible results.":h2Sign.el==="Air"?"You earn through ideas, communication, and social connections.":"You earn through intuition, emotional intelligence, and creative depth."}`,extra:()=>(<div>
+      <div style={{fontSize:11,color:TH.textDim,marginTop:8}}>2nd House Ruler: <span style={{color:h2RulerPl?.signColor}}>{h2Sign.ruler}</span> in {h2RulerPl?.sign} (H{h2RulerPl?.house})</div>
+      {planetsInH2.length>0?<div style={{marginTop:8}}><div style={{fontSize:10,letterSpacing:1.5,color:TH.textDim,textTransform:"uppercase",marginBottom:4}}>Planets in 2nd House</div>{planetsInH2.map(p=>{const pl=chart.pl[p.key];return(<div key={p.key} style={{display:"flex",alignItems:"center",gap:6,fontSize:12,color:TH.textMuted,padding:"4px 8px",background:`${p.color}08`,borderRadius:6,marginBottom:3}}><span style={{color:p.color,fontSize:16}}>{p.sym}</span><span style={{color:TH.text,fontWeight:600}}>{p.name}</span><span>in {pl?.sign}</span></div>)})}</div>:<div style={{fontSize:11,color:TH.textDim,marginTop:8,fontStyle:"italic"}}>No planets in the 2nd house — the ruler's condition tells the financial story.</div>}
+    </div>)},
+    {id:"h6",icon:"⚒",color:"#6ee7b7",title:"6th House — Daily Work & Service",sub:`${h6Sign.s} ${h6Sign.n} ${fmtDeg(h6cusp)}`,content:`Your 6th house in ${h6Sign.n} describes your daily work habits and service orientation. ${h6Sign.mod==="Cardinal"?"You initiate and lead in daily work.":h6Sign.mod==="Fixed"?"You're steady and persistent in routines.":"You're adaptable and versatile in your work approach."}`,extra:()=>(<div>
+      {planetsInH6.length>0?<div style={{marginTop:8}}><div style={{fontSize:10,letterSpacing:1.5,color:TH.textDim,textTransform:"uppercase",marginBottom:4}}>Planets in 6th House</div>{planetsInH6.map(p=>{const pl=chart.pl[p.key];return(<div key={p.key} style={{display:"flex",alignItems:"center",gap:6,fontSize:12,color:TH.textMuted,padding:"4px 8px",background:`${p.color}08`,borderRadius:6,marginBottom:3}}><span style={{color:p.color,fontSize:16}}>{p.sym}</span><span style={{color:TH.text,fontWeight:600}}>{p.name}</span><span>in {pl?.sign}</span></div>)})}</div>:<div style={{fontSize:11,color:TH.textDim,marginTop:8,fontStyle:"italic"}}>No planets in the 6th house — work routines shaped primarily by the cusp sign.</div>}
+    </div>)},
+    {id:"h8",icon:"🔄",color:"#f0abfc",title:"8th House — Shared Resources & Investments",sub:`${h8Sign.s} ${h8Sign.n} ${fmtDeg(h8cusp)}`,content:`Your 8th house in ${h8Sign.n} governs shared finances, investments, inheritance, taxes, and debt. This is "other people's money" — financial partnerships, joint ventures, and transformative financial events.`,extra:()=>(<div>
+      {planetsInH8.length>0?<div style={{marginTop:8}}><div style={{fontSize:10,letterSpacing:1.5,color:TH.textDim,textTransform:"uppercase",marginBottom:4}}>Planets in 8th House</div>{planetsInH8.map(p=>{const pl=chart.pl[p.key];return(<div key={p.key} style={{display:"flex",alignItems:"center",gap:6,fontSize:12,color:TH.textMuted,padding:"4px 8px",background:`${p.color}08`,borderRadius:6,marginBottom:3}}><span style={{color:p.color,fontSize:16}}>{p.sym}</span><span style={{color:TH.text,fontWeight:600}}>{p.name}</span><span>in {pl?.sign}</span></div>)})}</div>:<div style={{fontSize:11,color:TH.textDim,marginTop:8,fontStyle:"italic"}}>No planets in the 8th house — shared finances develop through the cusp ruler's condition.</div>}
+    </div>)},
+    {id:"saturn",icon:"♄",color:"#78716c",title:"Saturn — Career Authority & Discipline",sub:`${saturn?.signSym} ${saturn?.sign} ${saturn?.deg} · House ${saturn?.house}`,content:`Saturn in ${saturn?.sign} (House ${saturn?.house}) shows where you build professional mastery through patience, discipline, and earned authority. Saturn's house is where you face your biggest challenges — and ultimately build your most enduring legacy. ${saturn?.house===10?"Saturn in the 10th house is the classic 'CEO placement' — career defines your life journey.":saturn?.house===2?"Saturn in the 2nd demands financial discipline — wealth comes slowly but solidly.":saturn?.house===6?"Saturn in the 6th house makes you a meticulous, dedicated worker who earns respect through reliability.":"Saturn here channels discipline into the "+HOUSE_IX[saturn?.house]?.split(",")[0]+" domain."}`},
+    {id:"jupiter",icon:"♃",color:"#818cf8",title:"Jupiter — Expansion & Abundance",sub:`${jupiter?.signSym} ${jupiter?.sign} ${jupiter?.deg} · House ${jupiter?.house}`,content:`Jupiter in ${jupiter?.sign} (House ${jupiter?.house}) reveals where financial and professional growth comes most naturally. This is your area of luck, expansion, and opportunity. ${jupiter?.house===2?"Jupiter in the 2nd house is one of the strongest wealth indicators — natural financial abundance.":jupiter?.house===10?"Jupiter in the 10th blesses your career with expansion, recognition, and high-profile opportunities.":jupiter?.house===8?"Jupiter in the 8th can indicate significant wealth through investments, inheritance, or partnerships.":"Jupiter here brings growth and abundance through "+HOUSE_IX[jupiter?.house]?.split(",")[0]+"."}`},
+    {id:"venus",icon:"♀",color:"#f0abfc",title:"Venus — What You Attract & Value",sub:`${venus?.signSym} ${venus?.sign} ${venus?.deg} · House ${venus?.house}`,content:`Venus in ${venus?.sign} (House ${venus?.house}) shows your earning style and relationship with material comfort. Venus attracts resources through beauty, charm, diplomacy, and the things you genuinely value. ${venus?.house===2?"Venus in the 2nd house is excellent for finances — you naturally attract money and value comfort.":venus?.house===10?"Venus in the 10th makes your career charming, artistic, or relationship-oriented.":"Venus here draws resources through "+HOUSE_IX[venus?.house]?.split(",")[0]+"."}`},
   ];
 
   return (
-    React.createElement('div', { style: {display:"flex",flexDirection:"column",gap:6,maxWidth:640},}
-      , React.createElement('div', { style: {fontSize:10,letterSpacing:2,color:TH.textDim,textTransform:"uppercase",marginBottom:4},}, "Career, Finances & Professional Life"    )
-      , sections.map(s=>{
+    <div style={{display:"flex",flexDirection:"column",gap:6,maxWidth:640}}>
+      <div style={{fontSize:10,letterSpacing:2,color:TH.textDim,textTransform:"uppercase",marginBottom:4}}>Career, Finances & Professional Life</div>
+      {sections.map(s=>{
         const isOpen=open===s.id;
         return (
-          React.createElement('div', { key: s.id, style: {background:isOpen?TH.bgCard:"transparent",border:`1px solid ${isOpen?TH.cardBorder:TH.borderLight}`,borderRadius:12,overflow:"hidden",transition:"all 0.2s"},}
-            , React.createElement('div', { onClick: ()=>setOpen(isOpen?null:s.id), style: {display:"flex",alignItems:"center",gap:10,padding:"12px 16px",cursor:"pointer"},}
-              , React.createElement('span', { style: {fontSize:20},}, s.icon)
-              , React.createElement('div', { style: {flex:1},}
-                , React.createElement('div', { style: {fontSize:14,fontWeight:600,color:s.color||TH.text},}, s.title)
-                , React.createElement('div', { style: {fontSize:11,color:TH.textDim,marginTop:1},}, s.sub)
-              )
-              , React.createElement('span', { style: {color:TH.textDim,fontSize:12,transition:"transform 0.2s",transform:isOpen?"rotate(180deg)":"rotate(0deg)"},}, "▾")
-            )
-            , isOpen&&(
-              React.createElement('div', { style: {padding:"0 16px 16px",animation:"fadeIn 0.2s ease-out"},}
-                , React.createElement('div', { style: {fontSize:13,color:TH.textMuted,lineHeight:1.7},}, s.content)
-                , s.extra&&s.extra()
-              )
-            )
-          )
+          <div key={s.id} style={{background:isOpen?TH.bgCard:"transparent",border:`1px solid ${isOpen?TH.cardBorder:TH.borderLight}`,borderRadius:12,overflow:"hidden",transition:"all 0.2s"}}>
+            <div onClick={()=>setOpen(isOpen?null:s.id)} style={{display:"flex",alignItems:"center",gap:10,padding:"12px 16px",cursor:"pointer"}}>
+              <span style={{fontSize:20}}>{s.icon}</span>
+              <div style={{flex:1}}>
+                <div style={{fontSize:14,fontWeight:600,color:s.color||TH.text}}>{s.title}</div>
+                <div style={{fontSize:11,color:TH.textDim,marginTop:1}}>{s.sub}</div>
+              </div>
+              <span style={{color:TH.textDim,fontSize:12,transition:"transform 0.2s",transform:isOpen?"rotate(180deg)":"rotate(0deg)"}}>▾</span>
+            </div>
+            {isOpen&&(
+              <div style={{padding:"0 16px 16px",animation:"fadeIn 0.2s ease-out"}}>
+                <div style={{fontSize:13,color:TH.textMuted,lineHeight:1.7}}>{s.content}</div>
+                {s.extra&&s.extra()}
+              </div>
+            )}
+          </div>
         );
-      })
-      , React.createElement('div', { style: {background:`${TH.gold}08`,border:`1px solid ${TH.gold}20`,borderRadius:12,padding:14,marginTop:8},}
-        , React.createElement('div', { style: {fontSize:12,color:TH.gold,fontWeight:600,marginBottom:4},}, "💡 Financial Summary"  )
-        , React.createElement('div', { style: {fontSize:11,color:TH.textMuted,lineHeight:1.6},}, "Your money axis runs from "
-               , h2Sign.n, " (2nd, earned income) to "     , h8Sign.n, " (8th, shared resources). Career authority (MC) is in "         , mcSign.n, ", ruled by "   , mcSign.ruler, " in House "   , _optionalChain([h10RulerPl, 'optionalAccess', _183 => _183.house]), ". Key wealth indicators: Jupiter in H"      , _optionalChain([jupiter, 'optionalAccess', _184 => _184.house]), ", Venus in H"   , _optionalChain([venus, 'optionalAccess', _185 => _185.house]), ", Saturn building mastery in H"     , _optionalChain([saturn, 'optionalAccess', _186 => _186.house]), "."
-        )
-      )
-      , React.createElement('style', null, `@keyframes fadeIn{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:translateY(0)}}`)
-    )
+      })}
+      <div style={{background:`${TH.gold}08`,border:`1px solid ${TH.gold}20`,borderRadius:12,padding:14,marginTop:8}}>
+        <div style={{fontSize:12,color:TH.gold,fontWeight:600,marginBottom:4}}>💡 Financial Summary</div>
+        <div style={{fontSize:11,color:TH.textMuted,lineHeight:1.6}}>
+          Your money axis runs from {h2Sign.n} (2nd, earned income) to {h8Sign.n} (8th, shared resources). Career authority (MC) is in {mcSign.n}, ruled by {mcSign.ruler} in House {h10RulerPl?.house}. Key wealth indicators: Jupiter in H{jupiter?.house}, Venus in H{venus?.house}, Saturn building mastery in H{saturn?.house}.
+        </div>
+      </div>
+      <style>{`@keyframes fadeIn{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:translateY(0)}}`}</style>
+    </div>
   );
 }
 
 // ── Default test profile (Wes) ────────────────────────────────
 const WES_BIRTH={name:"Wes",year:1981,month:8,day:4,hour:8,minute:35,latitude:33.783,longitude:-118.30,location:"Harbor City, CA",utcOffset:-7};
 
-function Celestia(){
+export default function Celestia(){
   const [themeId,setThemeId]=useState(()=>LS.load("theme","dark"));
   const TH=THEMES[themeId]||THEMES.dark;
   const [profiles,setProfiles]=useState(()=>{const saved=LS.load("profiles",[]);if(!saved.find(p=>p.name==="Wes"))return[WES_BIRTH,...saved];return saved});
@@ -1698,7 +1622,7 @@ function Celestia(){
   useEffect(()=>{
     const c=genChart(WES_BIRTH,"placidus","tropical");
     if(c){setChart(c);setActive(WES_BIRTH);setPage("chart");
-      try{localStorage.setItem("celestia_active_natal",JSON.stringify(WES_BIRTH))}catch (e3){}
+      try{localStorage.setItem("celestia_active_natal",JSON.stringify(WES_BIRTH))}catch{}
     }
   },[]);
 
@@ -1713,7 +1637,7 @@ function Celestia(){
     setChart(c);setActive(bd);
     if(bd.name){const ex=profiles.findIndex(p=>p.name===bd.name),u=[...profiles];if(ex>=0)u[ex]=bd;else u.push(bd);saveP(u)}
     // Share active natal data with transits.html
-    try{localStorage.setItem("celestia_active_natal",JSON.stringify(bd))}catch (e4){}
+    try{localStorage.setItem("celestia_active_natal",JSON.stringify(bd))}catch{}
     setPage("chart");setTab("chart");setSynAspects(null);setChart2(null);setProgData(null);setSrData(null);
   },[hsys,zsys,profiles]);
 
@@ -1723,20 +1647,20 @@ function Celestia(){
 
   const exportChart=()=>{
     if(!chart||!active)return;
-    const lines=[`CELESTIA — Birth Chart Report`,`${"═".repeat(40)}`,`Name: ${_optionalChain([active, 'optionalAccess', _187 => _187.name])||"Unknown"}`,`Date: ${_optionalChain([active, 'optionalAccess', _188 => _188.month])}/${_optionalChain([active, 'optionalAccess', _189 => _189.day])}/${_optionalChain([active, 'optionalAccess', _190 => _190.year])}`,`Time: ${String(_optionalChain([active, 'optionalAccess', _191 => _191.hour])).padStart(2,"0")}:${String(_optionalChain([active, 'optionalAccess', _192 => _192.minute])).padStart(2,"0")}`,`Location: ${_optionalChain([active, 'optionalAccess', _193 => _193.location])}`,`System: ${zsys==="sidereal"?"Vedic Sidereal":"Western Tropical"} · ${_optionalChain([HSYS, 'access', _194 => _194.find, 'call', _195 => _195(h=>h.id===hsys), 'optionalAccess', _196 => _196.n])}`,``,`PLANETARY POSITIONS`,`${"─".repeat(40)}`];
-    for(const p of PLANETS){const pl=_optionalChain([chart, 'optionalAccess', _197 => _197.pl, 'access', _198 => _198[p.key]]);if(pl)lines.push(`${p.sym} ${p.name.padEnd(10)} ${pl.sign.padEnd(12)} ${pl.deg.padEnd(12)} House ${pl.house}${pl.rx?" ℞":""}`)}
-    lines.push(``,`HOUSES (${_optionalChain([HSYS, 'access', _199 => _199.find, 'call', _200 => _200(h=>h.id===hsys), 'optionalAccess', _201 => _201.n])})`,`${"─".repeat(40)}`);
+    const lines=[`CELESTIA — Birth Chart Report`,`${"═".repeat(40)}`,`Name: ${active?.name||"Unknown"}`,`Date: ${active?.month}/${active?.day}/${active?.year}`,`Time: ${String(active?.hour).padStart(2,"0")}:${String(active?.minute).padStart(2,"0")}`,`Location: ${active?.location}`,`System: ${zsys==="sidereal"?"Vedic Sidereal":"Western Tropical"} · ${HSYS.find(h=>h.id===hsys)?.n}`,``,`PLANETARY POSITIONS`,`${"─".repeat(40)}`];
+    for(const p of PLANETS){const pl=chart?.pl[p.key];if(pl)lines.push(`${p.sym} ${p.name.padEnd(10)} ${pl.sign.padEnd(12)} ${pl.deg.padEnd(12)} House ${pl.house}${pl.rx?" ℞":""}`)}
+    lines.push(``,`HOUSES (${HSYS.find(h=>h.id===hsys)?.n})`,`${"─".repeat(40)}`);
     for(let i=0;i<12;i++){const sg=getSign(chart.houses[i]);lines.push(`House ${String(i+1).padStart(2)}: ${sg.s} ${sg.n.padEnd(12)} ${fmtDeg(chart.houses[i])}`)}
     lines.push(``,`ASPECTS`,`${"─".repeat(40)}`);
-    for(const a of(_optionalChain([chart, 'optionalAccess', _202 => _202.aspects])||[]).slice(0,25)){const n1=_optionalChain([PLANETS, 'access', _203 => _203.find, 'call', _204 => _204(p=>p.key===a.p1), 'optionalAccess', _205 => _205.name]),n2=_optionalChain([PLANETS, 'access', _206 => _206.find, 'call', _207 => _207(p=>p.key===a.p2), 'optionalAccess', _208 => _208.name]);lines.push(`${n1} ${a.asp.sym} ${a.asp.name} ${n2} (${a.orb}° orb)`)}
-    if(_optionalChain([chart, 'optionalAccess', _209 => _209.patterns, 'optionalAccess', _210 => _210.length])){lines.push(``,`PATTERNS`,`${"─".repeat(40)}`);for(const p of chart.patterns)lines.push(`${p.name}: ${p.planets.map(k=>_optionalChain([PLANETS, 'access', _211 => _211.find, 'call', _212 => _212(pl=>pl.key===k), 'optionalAccess', _213 => _213.name])).join(", ")}`)}
+    for(const a of(chart?.aspects||[]).slice(0,25)){const n1=PLANETS.find(p=>p.key===a.p1)?.name,n2=PLANETS.find(p=>p.key===a.p2)?.name;lines.push(`${n1} ${a.asp.sym} ${a.asp.name} ${n2} (${a.orb}° orb)`)}
+    if(chart?.patterns?.length){lines.push(``,`PATTERNS`,`${"─".repeat(40)}`);for(const p of chart.patterns)lines.push(`${p.name}: ${p.planets.map(k=>PLANETS.find(pl=>pl.key===k)?.name).join(", ")}`)}
     const text=lines.join("\n");
     // Try clipboard first (works on mobile), then fallback to download
     if(navigator.clipboard&&navigator.clipboard.writeText){
       navigator.clipboard.writeText(text).then(()=>alert("Chart report copied to clipboard! Paste it anywhere.")).catch(()=>downloadText(text));
     }else{downloadText(text)}
   };
-  const downloadText=(text)=>{try{const blob=new Blob([text],{type:"text/plain"});const url=URL.createObjectURL(blob);const a=document.createElement("a");a.href=url;a.download=`${_optionalChain([active, 'optionalAccess', _214 => _214.name])||"chart"}-celestia.txt`;document.body.appendChild(a);a.click();document.body.removeChild(a);URL.revokeObjectURL(url)}catch (e5){prompt("Copy your chart report:",text)}};
+  const downloadText=(text)=>{try{const blob=new Blob([text],{type:"text/plain"});const url=URL.createObjectURL(blob);const a=document.createElement("a");a.href=url;a.download=`${active?.name||"chart"}-celestia.txt`;document.body.appendChild(a);a.click();document.body.removeChild(a);URL.revokeObjectURL(url)}catch{prompt("Copy your chart report:",text)}};
 
   // Profile switcher state
   // Profile switcher and edit state
@@ -1757,72 +1681,72 @@ function Celestia(){
   ];
 
   const sidebar=(
-    React.createElement('nav', { style: {width:220,minHeight:"100vh",padding:"24px 14px",background:themeId==="dark"?"rgba(10,10,24,0.85)":"rgba(235,229,245,0.95)",borderRight:`1px solid ${TH.borderLight}`,display:"flex",flexDirection:"column",gap:2,flexShrink:0,backdropFilter:"blur(20px)",overflowY:"auto"},}
-      , React.createElement('div', { style: {fontFamily:FONT_D,fontSize:22,color:TH.accent3,padding:"0 10px 16px",borderBottom:`1px solid ${TH.borderLight}`,marginBottom:8},}, "Celestia"
-        , React.createElement('div', { style: {fontSize:10,color:TH.textDim,fontFamily:FONT,letterSpacing:2,textTransform:"uppercase",marginTop:3},}, "Natal Chart Studio"  )
-      )
-      , navItems.map(it=>(
-        React.createElement('button', { key: it.id, onClick: ()=>{setPage(it.id);setMobileNav(false)}, style: {display:"flex",alignItems:"center",gap:9,padding:"9px 12px",borderRadius:7,background:page===it.id?TH.accentSoft:"transparent",color:page===it.id?TH.accent:TH.textMuted,border:"none",cursor:"pointer",fontFamily:FONT,fontSize:12.5,fontWeight:page===it.id?600:400,transition:"all .2s",textAlign:"left",width:"100%"},}
-          , React.createElement('span', { style: {fontSize:15,width:18,textAlign:"center"},}, it.icon), it.label
-        )
-      ))
-      , React.createElement('button', { onClick: ()=>setPage("transits"), style: {display:"flex",alignItems:"center",gap:9,padding:"9px 12px",borderRadius:7,background:"linear-gradient(135deg,rgba(201,168,76,0.1),rgba(201,168,76,0.05))",color:"#c9a84c",border:"1px solid rgba(201,168,76,0.2)",fontFamily:FONT,fontSize:12.5,fontWeight:600,cursor:"pointer",marginTop:4,textAlign:"left",width:"100%"},}
-        , React.createElement('span', { style: {fontSize:15,width:18,textAlign:"center"},}, "✦"), "Transit Forecast"
-      )
-      , React.createElement('div', { style: {marginTop:"auto",padding:"12px 10px 0",borderTop:`1px solid ${TH.borderLight}`,display:"flex",flexDirection:"column",gap:6},}
-        , React.createElement('div', { style: {fontSize:10,color:TH.textDim,letterSpacing:1.5,textTransform:"uppercase",marginBottom:4},}, "System")
-        , React.createElement('div', { style: {display:"flex",gap:3},}
-          , ["tropical","sidereal"].map(s=>React.createElement('button', { key: s, onClick: ()=>{setZsys(s);reCalc(hsys,s)}, style: {flex:1,padding:"5px 0",borderRadius:5,background:zsys===s?TH.accentSoft:"transparent",color:zsys===s?TH.accent:TH.textDim,border:`1px solid ${zsys===s?TH.accent+"40":TH.borderLight}`,fontSize:10,fontFamily:FONT,cursor:"pointer",textTransform:"capitalize",fontWeight:600},}, s))
-        )
-        , React.createElement('select', { value: hsys, onChange: e=>{setHsys(e.target.value);reCalc(e.target.value,zsys)}, style: {width:"100%",padding:"5px 6px",borderRadius:5,background:TH.inputBg,border:`1px solid ${TH.borderLight}`,color:TH.textMuted,fontFamily:FONT,fontSize:10,outline:"none"},}
-          , HSYS.map(h=>React.createElement('option', { key: h.id, value: h.id,}, h.n))
-        )
-        , React.createElement('button', { onClick: toggleTheme, style: {padding:"5px 0",borderRadius:5,background:TH.bgCard,border:`1px solid ${TH.borderLight}`,color:TH.textMuted,fontSize:10,fontFamily:FONT,cursor:"pointer"},}
-          , themeId==="dark"?"☀ Light Mode":"☽ Dark Mode"
-        )
-      )
-    )
+    <nav style={{width:220,minHeight:"100vh",padding:"24px 14px",background:themeId==="dark"?"rgba(10,10,24,0.85)":"rgba(235,229,245,0.95)",borderRight:`1px solid ${TH.borderLight}`,display:"flex",flexDirection:"column",gap:2,flexShrink:0,backdropFilter:"blur(20px)",overflowY:"auto"}}>
+      <div style={{fontFamily:FONT_D,fontSize:22,color:TH.accent3,padding:"0 10px 16px",borderBottom:`1px solid ${TH.borderLight}`,marginBottom:8}}>
+        Celestia<div style={{fontSize:10,color:TH.textDim,fontFamily:FONT,letterSpacing:2,textTransform:"uppercase",marginTop:3}}>Natal Chart Studio</div>
+      </div>
+      {navItems.map(it=>(
+        <button key={it.id} onClick={()=>{setPage(it.id);setMobileNav(false)}} style={{display:"flex",alignItems:"center",gap:9,padding:"9px 12px",borderRadius:7,background:page===it.id?TH.accentSoft:"transparent",color:page===it.id?TH.accent:TH.textMuted,border:"none",cursor:"pointer",fontFamily:FONT,fontSize:12.5,fontWeight:page===it.id?600:400,transition:"all .2s",textAlign:"left",width:"100%"}}>
+          <span style={{fontSize:15,width:18,textAlign:"center"}}>{it.icon}</span>{it.label}
+        </button>
+      ))}
+      <button onClick={()=>setPage("transits")} style={{display:"flex",alignItems:"center",gap:9,padding:"9px 12px",borderRadius:7,background:"linear-gradient(135deg,rgba(201,168,76,0.1),rgba(201,168,76,0.05))",color:"#c9a84c",border:"1px solid rgba(201,168,76,0.2)",fontFamily:FONT,fontSize:12.5,fontWeight:600,cursor:"pointer",marginTop:4,textAlign:"left",width:"100%"}}>
+        <span style={{fontSize:15,width:18,textAlign:"center"}}>✦</span>Transit Forecast
+      </button>
+      <div style={{marginTop:"auto",padding:"12px 10px 0",borderTop:`1px solid ${TH.borderLight}`,display:"flex",flexDirection:"column",gap:6}}>
+        <div style={{fontSize:10,color:TH.textDim,letterSpacing:1.5,textTransform:"uppercase",marginBottom:4}}>System</div>
+        <div style={{display:"flex",gap:3}}>
+          {["tropical","sidereal"].map(s=><button key={s} onClick={()=>{setZsys(s);reCalc(hsys,s)}} style={{flex:1,padding:"5px 0",borderRadius:5,background:zsys===s?TH.accentSoft:"transparent",color:zsys===s?TH.accent:TH.textDim,border:`1px solid ${zsys===s?TH.accent+"40":TH.borderLight}`,fontSize:10,fontFamily:FONT,cursor:"pointer",textTransform:"capitalize",fontWeight:600}}>{s}</button>)}
+        </div>
+        <select value={hsys} onChange={e=>{setHsys(e.target.value);reCalc(e.target.value,zsys)}} style={{width:"100%",padding:"5px 6px",borderRadius:5,background:TH.inputBg,border:`1px solid ${TH.borderLight}`,color:TH.textMuted,fontFamily:FONT,fontSize:10,outline:"none"}}>
+          {HSYS.map(h=><option key={h.id} value={h.id}>{h.n}</option>)}
+        </select>
+        <button onClick={toggleTheme} style={{padding:"5px 0",borderRadius:5,background:TH.bgCard,border:`1px solid ${TH.borderLight}`,color:TH.textMuted,fontSize:10,fontFamily:FONT,cursor:"pointer"}}>
+          {themeId==="dark"?"☀ Light Mode":"☽ Dark Mode"}
+        </button>
+      </div>
+    </nav>
   );
 
   const PL=PLANETS.find;
 
   return(
-    React.createElement('div', { style: {minHeight:"100vh",background:`linear-gradient(160deg,${TH.bgDeep} 0%,${TH.bg} 35%,${themeId==="dark"?"#141428":TH.bg} 70%,${TH.bgDeep} 100%)`,color:TH.text,fontFamily:FONT,display:"flex",position:"relative"},}
-      , React.createElement('link', { href: "https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Outfit:wght@300;400;500;600;700&display=swap", rel: "stylesheet",})
+    <div style={{minHeight:"100vh",background:`linear-gradient(160deg,${TH.bgDeep} 0%,${TH.bg} 35%,${themeId==="dark"?"#141428":TH.bg} 70%,${TH.bgDeep} 100%)`,color:TH.text,fontFamily:FONT,display:"flex",position:"relative"}}>
+      <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
 
-      /* Mobile hamburger — always visible on small screens via CSS class */
-      , React.createElement('button', { className: "mobile-menu-btn", onClick: ()=>setMobileNav(!mobileNav), style: {position:"fixed",top:12,left:12,zIndex:1001,background:TH.bgGlass,border:`1px solid ${TH.border}`,borderRadius:8,padding:"8px 12px",color:TH.accent,fontSize:18,cursor:"pointer",backdropFilter:"blur(10px)"},}, "☰")
+      {/* Mobile hamburger — always visible on small screens via CSS class */}
+      <button className="mobile-menu-btn" onClick={()=>setMobileNav(!mobileNav)} style={{position:"fixed",top:12,left:12,zIndex:1001,background:TH.bgGlass,border:`1px solid ${TH.border}`,borderRadius:8,padding:"8px 12px",color:TH.accent,fontSize:18,cursor:"pointer",backdropFilter:"blur(10px)"}}>☰</button>
 
-      /* Desktop sidebar */
-      , React.createElement('div', { className: "sidebar-desktop", style: {display:"block"},}, sidebar)
+      {/* Desktop sidebar */}
+      <div className="sidebar-desktop" style={{display:"block"}}>{sidebar}</div>
 
-      /* Mobile overlay */
-      , mobileNav&&React.createElement('div', { style: {position:"fixed",inset:0,zIndex:1000,background:"rgba(0,0,0,0.5)"}, onClick: ()=>setMobileNav(false),}, React.createElement('div', { onClick: e=>e.stopPropagation(),}, sidebar))
+      {/* Mobile overlay */}
+      {mobileNav&&<div style={{position:"fixed",inset:0,zIndex:1000,background:"rgba(0,0,0,0.5)"}} onClick={()=>setMobileNav(false)}><div onClick={e=>e.stopPropagation()}>{sidebar}</div></div>}
 
-      , React.createElement('style', null, `@media(max-width:768px){.sidebar-desktop{display:none !important}.mobile-menu-btn{display:block !important}}@media(min-width:769px){.mobile-menu-btn{display:none !important}}`)
+      <style>{`@media(max-width:768px){.sidebar-desktop{display:none !important}.mobile-menu-btn{display:block !important}}@media(min-width:769px){.mobile-menu-btn{display:none !important}}`}</style>
 
-      /* Main */
-      , React.createElement('main', { ref: chartRef, style: {flex:1,padding:"28px 24px",overflowY:"auto",maxHeight:"100vh"},}
+      {/* Main */}
+      <main ref={chartRef} style={{flex:1,padding:"28px 24px",overflowY:"auto",maxHeight:"100vh"}}>
 
-        /* ── HOME ── */
-        , page==="home"&&(
-          React.createElement('div', { style: {maxWidth:700},}
-            , React.createElement('div', { style: {fontSize:11,letterSpacing:3,color:TH.accent,textTransform:"uppercase",marginBottom:10},}, "Welcome to Celestia"  )
-            , React.createElement('h1', { style: {fontFamily:FONT_D,fontSize:38,fontWeight:400,margin:"0 0 14px",lineHeight:1.15,color:TH.lavender},}, "Your natal chart,"  , React.createElement('br', null), "decoded with precision."  )
-            , React.createElement('p', { style: {color:TH.textMuted,fontSize:14,lineHeight:1.7,marginBottom:28},}, "Calculate birth charts with high-precision astronomical algorithms. Explore placements, aspects, houses, transits, synastry, progressions, solar returns, and ephemeris data across Western tropical and Vedic sidereal systems."                         )
-            , React.createElement('div', { style: {display:"flex",gap:10,flexWrap:"wrap",marginBottom:20},}
-              , React.createElement(Btn, { primary: true, onClick: ()=>setPage("newchart"), theme: TH, style: {boxShadow:`0 4px 20px ${TH.accentGlow}`},}, "Create New Chart ✦"   )
-              , chart&&React.createElement(Btn, { onClick: ()=>setPage("chart"), theme: TH,}, "View Current Chart"  )
-              , profiles.length>0&&React.createElement(Btn, { onClick: ()=>setPage("profiles"), theme: TH,}, "Saved Profiles ("  , profiles.length, ")")
-            )
-            , React.createElement('button', { onClick: ()=>setPage("transits"), style: {display:"inline-flex",alignItems:"center",gap:8,padding:"12px 20px",borderRadius:10,background:"linear-gradient(135deg,rgba(201,168,76,0.15),rgba(201,168,76,0.05))",color:"#c9a84c",border:"1px solid rgba(201,168,76,0.3)",fontFamily:FONT,fontSize:14,fontWeight:600,cursor:"pointer",marginBottom:32,boxShadow:"0 4px 16px rgba(201,168,76,0.15)"},}
-              , React.createElement('span', { style: {fontSize:18},}, "✦"), " Transit Forecast — See What's Active Now"
-            )
+        {/* ── HOME ── */}
+        {page==="home"&&(
+          <div style={{maxWidth:700}}>
+            <div style={{fontSize:11,letterSpacing:3,color:TH.accent,textTransform:"uppercase",marginBottom:10}}>Welcome to Celestia</div>
+            <h1 style={{fontFamily:FONT_D,fontSize:38,fontWeight:400,margin:"0 0 14px",lineHeight:1.15,color:TH.lavender}}>Your natal chart,<br/>decoded with precision.</h1>
+            <p style={{color:TH.textMuted,fontSize:14,lineHeight:1.7,marginBottom:28}}>Calculate birth charts with high-precision astronomical algorithms. Explore placements, aspects, houses, transits, synastry, progressions, solar returns, and ephemeris data across Western tropical and Vedic sidereal systems.</p>
+            <div style={{display:"flex",gap:10,flexWrap:"wrap",marginBottom:20}}>
+              <Btn primary onClick={()=>setPage("newchart")} theme={TH} style={{boxShadow:`0 4px 20px ${TH.accentGlow}`}}>Create New Chart ✦</Btn>
+              {chart&&<Btn onClick={()=>setPage("chart")} theme={TH}>View Current Chart</Btn>}
+              {profiles.length>0&&<Btn onClick={()=>setPage("profiles")} theme={TH}>Saved Profiles ({profiles.length})</Btn>}
+            </div>
+            <button onClick={()=>setPage("transits")} style={{display:"inline-flex",alignItems:"center",gap:8,padding:"12px 20px",borderRadius:10,background:"linear-gradient(135deg,rgba(201,168,76,0.15),rgba(201,168,76,0.05))",color:"#c9a84c",border:"1px solid rgba(201,168,76,0.3)",fontFamily:FONT,fontSize:14,fontWeight:600,cursor:"pointer",marginBottom:32,boxShadow:"0 4px 16px rgba(201,168,76,0.15)"}}>
+              <span style={{fontSize:18}}>✦</span> Transit Forecast — See What's Active Now
+            </button>
 
-            /* Feature tour cards */
-            , React.createElement('div', { style: {fontSize:11,letterSpacing:2,color:TH.textDim,textTransform:"uppercase",marginBottom:12},}, "Explore")
-            , React.createElement('div', { style: {display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(180px,1fr))",gap:10,marginBottom:24},}
-              , [
+            {/* Feature tour cards */}
+            <div style={{fontSize:11,letterSpacing:2,color:TH.textDim,textTransform:"uppercase",marginBottom:12}}>Explore</div>
+            <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(180px,1fr))",gap:10,marginBottom:24}}>
+              {[
                 {icon:"☉",label:"Natal Chart",desc:"Interactive wheel with all planets, houses, aspects",page:"chart",req:true},
                 {icon:"✦",label:"Transits",desc:"Current influences + 12-month forecast",page:"transits",req:true},
                 {icon:"♡",label:"Synastry",desc:"Compare two charts for relationship insights",page:"synastry",req:true},
@@ -1830,275 +1754,275 @@ function Celestia(){
                 {icon:"☼",label:"Solar Return",desc:"Your annual return chart",page:"solarreturn",req:true},
                 {icon:"◯",label:"Ephemeris",desc:"Planetary positions for any date",page:"ephemeris",req:false},
               ].map((f,i)=>(
-                React.createElement('button', { key: i, onClick: ()=>{if(f.req&&!chart){setPage("newchart")}else{setPage(f.page)}}, style: {background:TH.bgCard,border:`1px solid ${TH.borderLight}`,borderRadius:12,padding:14,cursor:"pointer",textAlign:"left",transition:"all 0.15s",fontFamily:FONT},}
-                  , React.createElement('div', { style: {display:"flex",alignItems:"center",gap:8,marginBottom:6},}
-                    , React.createElement('span', { style: {fontSize:20,color:TH.accent},}, f.icon)
-                    , React.createElement('span', { style: {fontSize:13,fontWeight:600,color:TH.text},}, f.label)
-                  )
-                  , React.createElement('div', { style: {fontSize:11,color:TH.textDim,lineHeight:1.5},}, f.desc)
-                )
-              ))
-            )
+                <button key={i} onClick={()=>{if(f.req&&!chart){setPage("newchart")}else{setPage(f.page)}}} style={{background:TH.bgCard,border:`1px solid ${TH.borderLight}`,borderRadius:12,padding:14,cursor:"pointer",textAlign:"left",transition:"all 0.15s",fontFamily:FONT}}>
+                  <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:6}}>
+                    <span style={{fontSize:20,color:TH.accent}}>{f.icon}</span>
+                    <span style={{fontSize:13,fontWeight:600,color:TH.text}}>{f.label}</span>
+                  </div>
+                  <div style={{fontSize:11,color:TH.textDim,lineHeight:1.5}}>{f.desc}</div>
+                </button>
+              ))}
+            </div>
 
-            , React.createElement('div', { style: {display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(140px,1fr))",gap:10},}
-              , [{l:"House Systems",v:"2",i:"⌂"},{l:"Celestial Bodies",v:"14",i:"☉"},{l:"Zodiac Systems",v:"2",i:"♈"},{l:"Transit Content",v:"540",i:"✦"},{l:"Nakshatras",v:"27",i:"✧"},{l:"Privacy",v:"100%",i:"🔒"}].map((s,i)=>(
-                React.createElement('div', { key: i, style: {background:TH.bgCard,border:`1px solid ${TH.borderLight}`,borderRadius:12,padding:14,textAlign:"center"},}
-                  , React.createElement('div', { style: {fontSize:22,marginBottom:4},}, s.i)
-                  , React.createElement('div', { style: {fontSize:20,fontWeight:700,color:TH.accent,fontFamily:FONT_D},}, s.v)
-                  , React.createElement('div', { style: {fontSize:10,color:TH.textDim,marginTop:2},}, s.l)
-                )
-              ))
-            )
-          )
-        )
+            <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(140px,1fr))",gap:10}}>
+              {[{l:"House Systems",v:"2",i:"⌂"},{l:"Celestial Bodies",v:"14",i:"☉"},{l:"Zodiac Systems",v:"2",i:"♈"},{l:"Transit Content",v:"540",i:"✦"},{l:"Nakshatras",v:"27",i:"✧"},{l:"Privacy",v:"100%",i:"🔒"}].map((s,i)=>(
+                <div key={i} style={{background:TH.bgCard,border:`1px solid ${TH.borderLight}`,borderRadius:12,padding:14,textAlign:"center"}}>
+                  <div style={{fontSize:22,marginBottom:4}}>{s.i}</div>
+                  <div style={{fontSize:20,fontWeight:700,color:TH.accent,fontFamily:FONT_D}}>{s.v}</div>
+                  <div style={{fontSize:10,color:TH.textDim,marginTop:2}}>{s.l}</div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
 
-        /* ── NEW CHART ── */
-        , page==="newchart"&&(
-          React.createElement('div', { style: {maxWidth:480},}
-            , React.createElement('h2', { style: {fontFamily:FONT_D,fontSize:26,fontWeight:400,color:TH.lavender,marginBottom:6},}, "New Birth Chart"  )
-            , React.createElement('p', { style: {color:TH.textDim,fontSize:12,marginBottom:20},}, "Enter birth details for accurate chart calculation."      )
-            , React.createElement(BirthForm, { onSubmit: go, theme: TH,})
-          )
-        )
+        {/* ── NEW CHART ── */}
+        {page==="newchart"&&(
+          <div style={{maxWidth:480}}>
+            <h2 style={{fontFamily:FONT_D,fontSize:26,fontWeight:400,color:TH.lavender,marginBottom:6}}>New Birth Chart</h2>
+            <p style={{color:TH.textDim,fontSize:12,marginBottom:20}}>Enter birth details for accurate chart calculation.</p>
+            <BirthForm onSubmit={go} theme={TH}/>
+          </div>
+        )}
 
-        /* ── CHART VIEW ── */
-        , page==="chart"&&chart&&(
-          React.createElement('div', null
-            , React.createElement('div', { style: {display:"flex",alignItems:"flex-start",justifyContent:"space-between",marginBottom:16,flexWrap:"wrap",gap:8},}
-              /* Profile switcher — tap name to switch */
-              , React.createElement('div', { style: {position:"relative"},}
-                , React.createElement('button', { onClick: ()=>setShowSwitcher(!showSwitcher), style: {background:"transparent",border:"none",cursor:"pointer",textAlign:"left",padding:0},}
-                  , React.createElement('div', { style: {display:"flex",alignItems:"center",gap:8},}
-                    , React.createElement('h2', { style: {fontFamily:FONT_D,fontSize:26,fontWeight:400,color:TH.lavender,margin:0},}, _optionalChain([active, 'optionalAccess', _215 => _215.name])||"Chart")
-                    , React.createElement('span', { style: {color:TH.textDim,fontSize:14,transition:"transform 0.2s",transform:showSwitcher?"rotate(180deg)":"rotate(0deg)"},}, "▾")
-                  )
-                  , React.createElement('div', { style: {fontSize:11,color:TH.textDim,marginTop:3},}
-                    , MONTHS[(_optionalChain([active, 'optionalAccess', _216 => _216.month])||1)-1], " " , _optionalChain([active, 'optionalAccess', _217 => _217.day]), ", " , _optionalChain([active, 'optionalAccess', _218 => _218.year]), " · "  , (()=>{const h=_optionalChain([active, 'optionalAccess', _219 => _219.hour])||0,m=_optionalChain([active, 'optionalAccess', _220 => _220.minute])||0,dh=h===0?12:h>12?h-12:h,ap=h>=12?"PM":"AM";return`${dh}:${String(m).padStart(2,"0")} ${ap}`})(), " · "  , _optionalChain([active, 'optionalAccess', _221 => _221.location])
-                  )
-                )
-                , showSwitcher&&(
-                  React.createElement('div', { style: {position:"absolute",top:"100%",left:0,marginTop:8,zIndex:100,background:TH.bgDeep,border:`1px solid ${TH.border}`,borderRadius:12,padding:6,minWidth:260,boxShadow:`0 12px 40px rgba(0,0,0,.5)`,animation:"fadeIn 0.15s ease-out"},}
-                    , profiles.map((p,i)=>(
-                      React.createElement('div', { key: i, style: {display:"flex",alignItems:"center",gap:4,borderRadius:8,background:_optionalChain([active, 'optionalAccess', _222 => _222.name])===p.name?TH.accentSoft:"transparent",padding:"4px 4px 4px 0"},}
-                        , React.createElement('button', { onClick: ()=>{go(p);setShowSwitcher(false)}, style: {display:"flex",alignItems:"center",gap:8,flex:1,padding:"6px 10px",borderRadius:8,background:"transparent",border:"none",cursor:"pointer",textAlign:"left"},}
-                          , React.createElement('span', { style: {fontSize:16,color:_optionalChain([active, 'optionalAccess', _223 => _223.name])===p.name?TH.accent:TH.textDim},}, "◯")
-                          , React.createElement('div', null
-                            , React.createElement('div', { style: {fontSize:13,fontWeight:600,color:_optionalChain([active, 'optionalAccess', _224 => _224.name])===p.name?TH.accent:TH.text,fontFamily:FONT},}, p.name||"Unnamed")
-                            , React.createElement('div', { style: {fontSize:10,color:TH.textDim,fontFamily:FONT},}, MONTHS[(p.month||1)-1], " " , p.day, ", " , p.year)
-                          )
-                          , _optionalChain([active, 'optionalAccess', _225 => _225.name])===p.name&&React.createElement('span', { style: {marginLeft:"auto",color:TH.accent,fontSize:12},}, "✓")
-                        )
-                        , React.createElement('button', { onClick: (e)=>{e.stopPropagation();go(p);setShowSwitcher(false);setEditMode(true)}, style: {padding:"4px 6px",background:"transparent",border:"none",cursor:"pointer",color:TH.textDim,fontSize:12}, title: "Edit",}, "✎")
-                        , p.name!=="Wes"&&React.createElement('button', { onClick: (e)=>{e.stopPropagation();if(confirm("Delete "+p.name+"?")){{const u=profiles.filter((_,j)=>j!==i);saveP(u);if(_optionalChain([active, 'optionalAccess', _226 => _226.name])===p.name){if(u.length){go(u[0])}else{setChart(null);setActive(null);setPage("home")}}}}setShowSwitcher(false)}, style: {padding:"4px 6px",background:"transparent",border:"none",cursor:"pointer",color:"#ef4444",fontSize:11}, title: "Delete",}, "✕")
-                      )
-                    ))
-                    , React.createElement('div', { style: {borderTop:`1px solid ${TH.borderLight}`,marginTop:4,paddingTop:4},}
-                      , React.createElement('button', { onClick: ()=>{setShowSwitcher(false);setPage("newchart")}, style: {display:"flex",alignItems:"center",gap:8,width:"100%",padding:"10px 12px",borderRadius:8,background:"transparent",border:"none",cursor:"pointer",textAlign:"left"},}
-                        , React.createElement('span', { style: {fontSize:18,color:TH.accent},}, "+")
-                        , React.createElement('span', { style: {fontSize:13,color:TH.accent,fontWeight:600,fontFamily:FONT},}, "Add New Person"  )
-                      )
-                    )
-                  )
-                )
-              )
-              , React.createElement('div', { style: {display:"flex",gap:4,flexWrap:"wrap"},}
-                , React.createElement(Btn, { small: true, onClick: ()=>setEditMode(!editMode), theme: TH, style: editMode?{background:TH.accentSoft,color:TH.accent,border:`1px solid ${TH.accent}40`}:{},}, editMode?"✕ Cancel":"✎ Edit")
-                , ["wheel","cards"].map(v=>React.createElement('button', { key: v, onClick: ()=>{setView(v);setEditMode(false)}, style: {padding:"6px 14px",borderRadius:6,background:view===v&&!editMode?TH.accentSoft:"transparent",color:view===v&&!editMode?TH.accent:TH.textDim,border:`1px solid ${view===v&&!editMode?TH.accent+"40":TH.borderLight}`,fontSize:11,fontFamily:FONT,cursor:"pointer",fontWeight:600},}, v==="wheel"?"◯ Wheel":"▤ Cards"))
-                , React.createElement(Btn, { small: true, onClick: exportChart, theme: TH,}, "📋 Export" )
-                , React.createElement('button', { onClick: ()=>setPage("transits"), style: {padding:"6px 12px",borderRadius:6,background:"linear-gradient(135deg,rgba(201,168,76,0.15),rgba(201,168,76,0.05))",color:"#c9a84c",border:"1px solid rgba(201,168,76,0.25)",fontFamily:FONT,fontSize:11,fontWeight:600,cursor:"pointer"},}, "✦ Transits" )
-              )
-            )
+        {/* ── CHART VIEW ── */}
+        {page==="chart"&&chart&&(
+          <div>
+            <div style={{display:"flex",alignItems:"flex-start",justifyContent:"space-between",marginBottom:16,flexWrap:"wrap",gap:8}}>
+              {/* Profile switcher — tap name to switch */}
+              <div style={{position:"relative"}}>
+                <button onClick={()=>setShowSwitcher(!showSwitcher)} style={{background:"transparent",border:"none",cursor:"pointer",textAlign:"left",padding:0}}>
+                  <div style={{display:"flex",alignItems:"center",gap:8}}>
+                    <h2 style={{fontFamily:FONT_D,fontSize:26,fontWeight:400,color:TH.lavender,margin:0}}>{active?.name||"Chart"}</h2>
+                    <span style={{color:TH.textDim,fontSize:14,transition:"transform 0.2s",transform:showSwitcher?"rotate(180deg)":"rotate(0deg)"}}>▾</span>
+                  </div>
+                  <div style={{fontSize:11,color:TH.textDim,marginTop:3}}>
+                    {MONTHS[(active?.month||1)-1]} {active?.day}, {active?.year} · {(()=>{const h=active?.hour||0,m=active?.minute||0,dh=h===0?12:h>12?h-12:h,ap=h>=12?"PM":"AM";return`${dh}:${String(m).padStart(2,"0")} ${ap}`})()} · {active?.location}
+                  </div>
+                </button>
+                {showSwitcher&&(
+                  <div style={{position:"absolute",top:"100%",left:0,marginTop:8,zIndex:100,background:TH.bgDeep,border:`1px solid ${TH.border}`,borderRadius:12,padding:6,minWidth:260,boxShadow:`0 12px 40px rgba(0,0,0,.5)`,animation:"fadeIn 0.15s ease-out"}}>
+                    {profiles.map((p,i)=>(
+                      <div key={i} style={{display:"flex",alignItems:"center",gap:4,borderRadius:8,background:active?.name===p.name?TH.accentSoft:"transparent",padding:"4px 4px 4px 0"}}>
+                        <button onClick={()=>{go(p);setShowSwitcher(false)}} style={{display:"flex",alignItems:"center",gap:8,flex:1,padding:"6px 10px",borderRadius:8,background:"transparent",border:"none",cursor:"pointer",textAlign:"left"}}>
+                          <span style={{fontSize:16,color:active?.name===p.name?TH.accent:TH.textDim}}>◯</span>
+                          <div>
+                            <div style={{fontSize:13,fontWeight:600,color:active?.name===p.name?TH.accent:TH.text,fontFamily:FONT}}>{p.name||"Unnamed"}</div>
+                            <div style={{fontSize:10,color:TH.textDim,fontFamily:FONT}}>{MONTHS[(p.month||1)-1]} {p.day}, {p.year}</div>
+                          </div>
+                          {active?.name===p.name&&<span style={{marginLeft:"auto",color:TH.accent,fontSize:12}}>✓</span>}
+                        </button>
+                        <button onClick={(e)=>{e.stopPropagation();go(p);setShowSwitcher(false);setEditMode(true)}} style={{padding:"4px 6px",background:"transparent",border:"none",cursor:"pointer",color:TH.textDim,fontSize:12}} title="Edit">✎</button>
+                        {p.name!=="Wes"&&<button onClick={(e)=>{e.stopPropagation();if(confirm("Delete "+p.name+"?")){{const u=profiles.filter((_,j)=>j!==i);saveP(u);if(active?.name===p.name){if(u.length){go(u[0])}else{setChart(null);setActive(null);setPage("home")}}}}setShowSwitcher(false)}} style={{padding:"4px 6px",background:"transparent",border:"none",cursor:"pointer",color:"#ef4444",fontSize:11}} title="Delete">✕</button>}
+                      </div>
+                    ))}
+                    <div style={{borderTop:`1px solid ${TH.borderLight}`,marginTop:4,paddingTop:4}}>
+                      <button onClick={()=>{setShowSwitcher(false);setPage("newchart")}} style={{display:"flex",alignItems:"center",gap:8,width:"100%",padding:"10px 12px",borderRadius:8,background:"transparent",border:"none",cursor:"pointer",textAlign:"left"}}>
+                        <span style={{fontSize:18,color:TH.accent}}>+</span>
+                        <span style={{fontSize:13,color:TH.accent,fontWeight:600,fontFamily:FONT}}>Add New Person</span>
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </div>
+              <div style={{display:"flex",gap:4,flexWrap:"wrap"}}>
+                <Btn small onClick={()=>setEditMode(!editMode)} theme={TH} style={editMode?{background:TH.accentSoft,color:TH.accent,border:`1px solid ${TH.accent}40`}:{}}>{editMode?"✕ Cancel":"✎ Edit"}</Btn>
+                {["wheel","cards"].map(v=><button key={v} onClick={()=>{setView(v);setEditMode(false)}} style={{padding:"6px 14px",borderRadius:6,background:view===v&&!editMode?TH.accentSoft:"transparent",color:view===v&&!editMode?TH.accent:TH.textDim,border:`1px solid ${view===v&&!editMode?TH.accent+"40":TH.borderLight}`,fontSize:11,fontFamily:FONT,cursor:"pointer",fontWeight:600}}>{v==="wheel"?"◯ Wheel":"▤ Cards"}</button>)}
+                <Btn small onClick={exportChart} theme={TH}>📋 Export</Btn>
+                <button onClick={()=>setPage("transits")} style={{padding:"6px 12px",borderRadius:6,background:"linear-gradient(135deg,rgba(201,168,76,0.15),rgba(201,168,76,0.05))",color:"#c9a84c",border:"1px solid rgba(201,168,76,0.25)",fontFamily:FONT,fontSize:11,fontWeight:600,cursor:"pointer"}}>✦ Transits</button>
+              </div>
+            </div>
 
-            /* Edit mode — show birth form pre-filled */
-            , editMode?(
-              React.createElement('div', { style: {maxWidth:480,marginBottom:20},}
-                , React.createElement('div', { style: {fontSize:12,color:TH.accent,fontWeight:600,marginBottom:12},}, "✎ Editing "  , _optionalChain([active, 'optionalAccess', _227 => _227.name])||"Chart")
-                , React.createElement(BirthForm, { onSubmit: (bd)=>{go(bd);setEditMode(false)}, initial: active, onCancel: ()=>setEditMode(false), theme: TH,})
-              )
+            {/* Edit mode — show birth form pre-filled */}
+            {editMode?(
+              <div style={{maxWidth:480,marginBottom:20}}>
+                <div style={{fontSize:12,color:TH.accent,fontWeight:600,marginBottom:12}}>✎ Editing {active?.name||"Chart"}</div>
+                <BirthForm onSubmit={(bd)=>{go(bd);setEditMode(false)}} initial={active} onCancel={()=>setEditMode(false)} theme={TH}/>
+              </div>
             ):(
-            React.createElement('div', null
+            <div>
 
-            /* Inline system controls — easy to change */
-            , React.createElement('div', { style: {display:"flex",gap:6,alignItems:"center",marginBottom:16,flexWrap:"wrap",padding:"10px 14px",background:TH.bgCard,borderRadius:10,border:`1px solid ${TH.borderLight}`},}
-              , React.createElement('span', { style: {fontSize:10,color:TH.textDim,letterSpacing:1,textTransform:"uppercase",marginRight:4},}, "Zodiac")
-              , ["tropical","sidereal"].map(s=>(
-                React.createElement('button', { key: s, onClick: ()=>{setZsys(s);if(active){const c=genChart(active,hsys,s);if(c)setChart(c)}}, style: {padding:"5px 12px",borderRadius:6,background:zsys===s?TH.accentSoft:"transparent",color:zsys===s?TH.accent:TH.textDim,border:`1px solid ${zsys===s?TH.accent+"40":"transparent"}`,fontSize:11,fontFamily:FONT,cursor:"pointer",fontWeight:600,textTransform:"capitalize"},}, s==="tropical"?"♈ Tropical":"☸ Sidereal")
-              ))
-              , React.createElement('div', { style: {width:1,height:20,background:TH.borderLight,margin:"0 6px"},})
-              , React.createElement('span', { style: {fontSize:10,color:TH.textDim,letterSpacing:1,textTransform:"uppercase",marginRight:4},}, "Houses")
-              , HSYS.map(h=>(
-                React.createElement('button', { key: h.id, onClick: ()=>{setHsys(h.id);if(active){const c=genChart(active,h.id,zsys);if(c)setChart(c)}}, style: {padding:"5px 10px",borderRadius:6,background:hsys===h.id?TH.accentSoft:"transparent",color:hsys===h.id?TH.accent:TH.textDim,border:`1px solid ${hsys===h.id?TH.accent+"40":"transparent"}`,fontSize:10,fontFamily:FONT,cursor:"pointer",fontWeight:hsys===h.id?600:400},}, h.n)
-              ))
-            )
+            {/* Inline system controls — easy to change */}
+            <div style={{display:"flex",gap:6,alignItems:"center",marginBottom:16,flexWrap:"wrap",padding:"10px 14px",background:TH.bgCard,borderRadius:10,border:`1px solid ${TH.borderLight}`}}>
+              <span style={{fontSize:10,color:TH.textDim,letterSpacing:1,textTransform:"uppercase",marginRight:4}}>Zodiac</span>
+              {["tropical","sidereal"].map(s=>(
+                <button key={s} onClick={()=>{setZsys(s);if(active){const c=genChart(active,hsys,s);if(c)setChart(c)}}} style={{padding:"5px 12px",borderRadius:6,background:zsys===s?TH.accentSoft:"transparent",color:zsys===s?TH.accent:TH.textDim,border:`1px solid ${zsys===s?TH.accent+"40":"transparent"}`,fontSize:11,fontFamily:FONT,cursor:"pointer",fontWeight:600,textTransform:"capitalize"}}>{s==="tropical"?"♈ Tropical":"☸ Sidereal"}</button>
+              ))}
+              <div style={{width:1,height:20,background:TH.borderLight,margin:"0 6px"}}/>
+              <span style={{fontSize:10,color:TH.textDim,letterSpacing:1,textTransform:"uppercase",marginRight:4}}>Houses</span>
+              {HSYS.map(h=>(
+                <button key={h.id} onClick={()=>{setHsys(h.id);if(active){const c=genChart(active,h.id,zsys);if(c)setChart(c)}}} style={{padding:"5px 10px",borderRadius:6,background:hsys===h.id?TH.accentSoft:"transparent",color:hsys===h.id?TH.accent:TH.textDim,border:`1px solid ${hsys===h.id?TH.accent+"40":"transparent"}`,fontSize:10,fontFamily:FONT,cursor:"pointer",fontWeight:hsys===h.id?600:400}}>{h.n}</button>
+              ))}
+            </div>
 
-            , React.createElement(Tabs, { tabs: [{id:"chart",label:"Chart"},{id:"interpret",label:"Interpretations"},{id:"patterns",label:"Patterns"},{id:"houses",label:"Houses"},{id:"dignity",label:"Dignities"},{id:"career",label:"Career & Finance"}], active: tab, onChange: setTab, theme: TH,})
+            <Tabs tabs={[{id:"chart",label:"Chart"},{id:"interpret",label:"Interpretations"},{id:"patterns",label:"Patterns"},{id:"houses",label:"Houses"},{id:"dignity",label:"Dignities"},{id:"career",label:"Career & Finance"}]} active={tab} onChange={setTab} theme={TH}/>
 
-            , tab==="chart"&&(
-              React.createElement('div', { style: {display:"flex",gap:24,flexWrap:"wrap"},}
-                , view==="wheel"?(
-                  React.createElement(React.Fragment, null
-                    , React.createElement('div', { style: {flexShrink:0},}, React.createElement(Wheel, { chart: chart, size: Math.min(420,380), theme: TH, zsys: zsys,}))
-                    , React.createElement('div', { style: {flex:1,minWidth:240},}
-                      , React.createElement('div', { style: {fontSize:10,letterSpacing:2,color:TH.textDim,textTransform:"uppercase",marginBottom:10},}, "Placements")
-                      , PLANETS.map(p=>{const pl=chart.pl[p.key];if(!pl)return null;const dig=getDignity(p.name,pl.sign);return(
-                        React.createElement('div', { key: p.key, style: {display:"flex",alignItems:"center",gap:8,padding:"6px 0",borderBottom:`1px solid ${TH.borderLight}`,fontSize:12},}
-                          , React.createElement('span', { style: {color:p.color,fontSize:16,width:20,textAlign:"center"},}, p.sym)
-                          , React.createElement('span', { style: {width:60,color:TH.text},}, p.name)
-                          , React.createElement('span', { style: {color:pl.signColor},}, pl.signSym)
-                          , React.createElement('span', { style: {color:TH.textMuted,flex:1},}, pl.sign, " " , pl.deg)
-                          , React.createElement('span', { style: {color:TH.textDim,fontSize:10},}, "H", pl.house)
-                          , dig&&React.createElement('span', { style: {color:dig.color,fontSize:9,padding:"1px 4px",borderRadius:3,background:`${dig.color}15`},}, dig.icon, dig.type)
-                          , pl.rx&&React.createElement('span', { style: {color:TH.rose,fontSize:10},}, "℞")
-                        )
-                      )})
-                      , zsys==="sidereal"&&React.createElement('div', { style: {marginTop:14},}, React.createElement('div', { style: {fontSize:10,letterSpacing:2,color:TH.accent,textTransform:"uppercase",marginBottom:6},}, "Nakshatras"), ["sun","moon","mercury","venus","mars"].map(k=>{const pl=chart.pl[k],p=PLANETS.find(pp=>pp.key===k);return (React.createElement('div', { key: k, style: {display:"flex",gap:6,padding:"3px 0",fontSize:11,color:TH.textMuted},}, React.createElement('span', { style: {color:p.color},}, p.sym), _optionalChain([pl, 'optionalAccess', _228 => _228.nak])))}))
-                    )
-                  )
+            {tab==="chart"&&(
+              <div style={{display:"flex",gap:24,flexWrap:"wrap"}}>
+                {view==="wheel"?(
+                  <>
+                    <div style={{flexShrink:0}}><Wheel chart={chart} size={Math.min(420,380)} theme={TH} zsys={zsys}/></div>
+                    <div style={{flex:1,minWidth:240}}>
+                      <div style={{fontSize:10,letterSpacing:2,color:TH.textDim,textTransform:"uppercase",marginBottom:10}}>Placements</div>
+                      {PLANETS.map(p=>{const pl=chart.pl[p.key];if(!pl)return null;const dig=getDignity(p.name,pl.sign);return(
+                        <div key={p.key} style={{display:"flex",alignItems:"center",gap:8,padding:"6px 0",borderBottom:`1px solid ${TH.borderLight}`,fontSize:12}}>
+                          <span style={{color:p.color,fontSize:16,width:20,textAlign:"center"}}>{p.sym}</span>
+                          <span style={{width:60,color:TH.text}}>{p.name}</span>
+                          <span style={{color:pl.signColor}}>{pl.signSym}</span>
+                          <span style={{color:TH.textMuted,flex:1}}>{pl.sign} {pl.deg}</span>
+                          <span style={{color:TH.textDim,fontSize:10}}>H{pl.house}</span>
+                          {dig&&<span style={{color:dig.color,fontSize:9,padding:"1px 4px",borderRadius:3,background:`${dig.color}15`}}>{dig.icon}{dig.type}</span>}
+                          {pl.rx&&<span style={{color:TH.rose,fontSize:10}}>℞</span>}
+                        </div>
+                      )})}
+                      {zsys==="sidereal"&&<div style={{marginTop:14}}><div style={{fontSize:10,letterSpacing:2,color:TH.accent,textTransform:"uppercase",marginBottom:6}}>Nakshatras</div>{["sun","moon","mercury","venus","mars"].map(k=>{const pl=chart.pl[k],p=PLANETS.find(pp=>pp.key===k);return (<div key={k} style={{display:"flex",gap:6,padding:"3px 0",fontSize:11,color:TH.textMuted}}><span style={{color:p.color}}>{p.sym}</span>{pl?.nak}</div>)})}</div>}
+                    </div>
+                  </>
                 ):(
-                  React.createElement('div', { style: {display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(190px,1fr))",gap:8,width:"100%"},}
-                    , PLANETS.map(p=>{const pl=chart.pl[p.key];if(!pl)return null;const sg=getSign(chart.pos[p.key].lon),dig=getDignity(p.name,pl.sign);return(
-                      React.createElement('div', { key: p.key, style: {background:TH.bgCard,border:`1px solid ${TH.cardBorder}`,borderRadius:12,padding:14},}
-                        , React.createElement('div', { style: {display:"flex",alignItems:"center",gap:8,marginBottom:8},}
-                          , React.createElement('span', { style: {fontSize:22,color:p.color},}, p.sym)
-                          , React.createElement('div', null, React.createElement('div', { style: {fontSize:13,fontWeight:600,color:TH.text},}, p.name), React.createElement('div', { style: {fontSize:10,color:TH.textMuted},}, pl.deg))
-                          , pl.rx&&React.createElement('span', { style: {marginLeft:"auto",color:TH.rose,fontSize:10},}, "℞")
-                        )
-                        , React.createElement('div', { style: {display:"flex",alignItems:"center",gap:5,background:`${sg.c}12`,borderRadius:5,padding:"4px 7px",marginBottom:6},}
-                          , React.createElement('span', { style: {color:sg.c,fontSize:14},}, sg.s), React.createElement('span', { style: {color:TH.text,fontSize:12},}, pl.sign)
-                          , dig&&React.createElement('span', { style: {marginLeft:"auto",color:dig.color,fontSize:9},}, dig.icon, dig.type)
-                        )
-                        , React.createElement('div', { style: {fontSize:10,color:TH.textDim,lineHeight:1.4},}, "House " , pl.house, " · "  , _optionalChain([HOUSE_IX, 'access', _229 => _229[pl.house], 'optionalAccess', _230 => _230.split, 'call', _231 => _231(","), 'access', _232 => _232[0]]))
-                        , zsys==="sidereal"&&React.createElement('div', { style: {color:TH.accent,fontSize:10,marginTop:3},}, "✧ " , pl.nak)
-                      )
-                    )})
-                  )
-                )
-              )
-            )
+                  <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(190px,1fr))",gap:8,width:"100%"}}>
+                    {PLANETS.map(p=>{const pl=chart.pl[p.key];if(!pl)return null;const sg=getSign(chart.pos[p.key].lon),dig=getDignity(p.name,pl.sign);return(
+                      <div key={p.key} style={{background:TH.bgCard,border:`1px solid ${TH.cardBorder}`,borderRadius:12,padding:14}}>
+                        <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:8}}>
+                          <span style={{fontSize:22,color:p.color}}>{p.sym}</span>
+                          <div><div style={{fontSize:13,fontWeight:600,color:TH.text}}>{p.name}</div><div style={{fontSize:10,color:TH.textMuted}}>{pl.deg}</div></div>
+                          {pl.rx&&<span style={{marginLeft:"auto",color:TH.rose,fontSize:10}}>℞</span>}
+                        </div>
+                        <div style={{display:"flex",alignItems:"center",gap:5,background:`${sg.c}12`,borderRadius:5,padding:"4px 7px",marginBottom:6}}>
+                          <span style={{color:sg.c,fontSize:14}}>{sg.s}</span><span style={{color:TH.text,fontSize:12}}>{pl.sign}</span>
+                          {dig&&<span style={{marginLeft:"auto",color:dig.color,fontSize:9}}>{dig.icon}{dig.type}</span>}
+                        </div>
+                        <div style={{fontSize:10,color:TH.textDim,lineHeight:1.4}}>House {pl.house} · {HOUSE_IX[pl.house]?.split(",")[0]}</div>
+                        {zsys==="sidereal"&&<div style={{color:TH.accent,fontSize:10,marginTop:3}}>✧ {pl.nak}</div>}
+                      </div>
+                    )})}
+                  </div>
+                )}
+              </div>
+            )}
 
-            , tab==="interpret"&&(
-              React.createElement(InterpretTab, { chart: chart, TH: TH, zsys: zsys,})
-            )
+            {tab==="interpret"&&(
+              <InterpretTab chart={chart} TH={TH} zsys={zsys}/>
+            )}
 
-            , tab==="patterns"&&(
-              React.createElement(PatternsTab, { chart: chart, TH: TH,})
-            )
+            {tab==="patterns"&&(
+              <PatternsTab chart={chart} TH={TH}/>
+            )}
 
-            , tab==="houses"&&(
-              React.createElement(HousesTab, { chart: chart, TH: TH,})
-            )
+            {tab==="houses"&&(
+              <HousesTab chart={chart} TH={TH}/>
+            )}
 
-            , tab==="dignity"&&(
-              React.createElement(DignityTab, { chart: chart, TH: TH,})
-            )
+            {tab==="dignity"&&(
+              <DignityTab chart={chart} TH={TH}/>
+            )}
 
-            , tab==="career"&&chart&&(
-              React.createElement(CareerTab, { chart: chart, TH: TH,})
-            )
-            ))
-          )
-        )
+            {tab==="career"&&chart&&(
+              <CareerTab chart={chart} TH={TH}/>
+            )}
+            </div>)}
+          </div>
+        )}
 
-        /* ── PROFILES ── */
-        , page==="profiles"&&(
-          React.createElement('div', { style: {maxWidth:580},}
-            , React.createElement('div', { style: {display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:20},}
-              , React.createElement('h2', { style: {fontFamily:FONT_D,fontSize:26,fontWeight:400,color:TH.lavender,margin:0},}, "Saved Profiles" )
-              , React.createElement(Btn, { small: true, onClick: ()=>setPage("newchart"), theme: TH,}, "+ New" )
-            )
-            , profiles.length===0?React.createElement('div', { style: {color:TH.textDim,fontSize:13,padding:32,textAlign:"center"},}, "No profiles yet."  ):(
-              React.createElement('div', { style: {display:"flex",flexDirection:"column",gap:6},}
-                , profiles.map((p,i)=>(
-                  React.createElement('div', { key: i, style: {display:"flex",alignItems:"center",justifyContent:"space-between",background:TH.bgCard,border:`1px solid ${TH.cardBorder}`,borderRadius:12,padding:"12px 16px",cursor:"pointer"}, onClick: ()=>go(p),}
-                    , React.createElement('div', null, React.createElement('div', { style: {fontSize:14,fontWeight:600,color:TH.text},}, p.name||"Unnamed"), React.createElement('div', { style: {fontSize:11,color:TH.textDim,marginTop:1},}, MONTHS[(p.month||1)-1], " " , p.day, ", " , p.year, " · "  , p.location))
-                    , React.createElement('div', { style: {display:"flex",gap:6},}
-                      , React.createElement(Btn, { small: true, onClick: e=>{e.stopPropagation();go(p)}, theme: TH,}, "View")
-                      , React.createElement('button', { onClick: e=>{e.stopPropagation();const u=profiles.filter((_,idx)=>idx!==i);saveP(u)}, style: {padding:"5px 10px",borderRadius:6,background:"rgba(239,68,68,0.1)",color:"#ef4444",border:"none",fontSize:10,cursor:"pointer",fontFamily:FONT},}, "Del")
-                    )
-                  )
-                ))
-              )
-            )
-            , React.createElement('div', { style: {marginTop:20,display:"flex",gap:6},}
-              , React.createElement(Btn, { small: true, theme: TH, onClick: ()=>{const b=new Blob([JSON.stringify(profiles,null,2)],{type:"application/json"}),u=URL.createObjectURL(b),a=document.createElement("a");a.href=u;a.download="celestia-profiles.json";a.click()},}, "↓ Export" )
-              , React.createElement('label', { style: {padding:"6px 12px",borderRadius:8,background:TH.bgCard,color:TH.textMuted,border:`1px solid ${TH.border}`,fontSize:12,fontFamily:FONT,cursor:"pointer"},}, "↑ Import" , React.createElement('input', { type: "file", accept: ".json", style: {display:"none"}, onChange: e=>{const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=ev=>{try{const imp=JSON.parse(ev.target.result);if(Array.isArray(imp)){const m=[...profiles,...imp.filter(p=>!profiles.find(ep=>ep.name===p.name))];saveP(m)}}catch (e6){}};r.readAsText(f)},}))
-            )
-          )
-        )
+        {/* ── PROFILES ── */}
+        {page==="profiles"&&(
+          <div style={{maxWidth:580}}>
+            <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:20}}>
+              <h2 style={{fontFamily:FONT_D,fontSize:26,fontWeight:400,color:TH.lavender,margin:0}}>Saved Profiles</h2>
+              <Btn small onClick={()=>setPage("newchart")} theme={TH}>+ New</Btn>
+            </div>
+            {profiles.length===0?<div style={{color:TH.textDim,fontSize:13,padding:32,textAlign:"center"}}>No profiles yet.</div>:(
+              <div style={{display:"flex",flexDirection:"column",gap:6}}>
+                {profiles.map((p,i)=>(
+                  <div key={i} style={{display:"flex",alignItems:"center",justifyContent:"space-between",background:TH.bgCard,border:`1px solid ${TH.cardBorder}`,borderRadius:12,padding:"12px 16px",cursor:"pointer"}} onClick={()=>go(p)}>
+                    <div><div style={{fontSize:14,fontWeight:600,color:TH.text}}>{p.name||"Unnamed"}</div><div style={{fontSize:11,color:TH.textDim,marginTop:1}}>{MONTHS[(p.month||1)-1]} {p.day}, {p.year} · {p.location}</div></div>
+                    <div style={{display:"flex",gap:6}}>
+                      <Btn small onClick={e=>{e.stopPropagation();go(p)}} theme={TH}>View</Btn>
+                      <button onClick={e=>{e.stopPropagation();const u=profiles.filter((_,idx)=>idx!==i);saveP(u)}} style={{padding:"5px 10px",borderRadius:6,background:"rgba(239,68,68,0.1)",color:"#ef4444",border:"none",fontSize:10,cursor:"pointer",fontFamily:FONT}}>Del</button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+            <div style={{marginTop:20,display:"flex",gap:6}}>
+              <Btn small theme={TH} onClick={()=>{const b=new Blob([JSON.stringify(profiles,null,2)],{type:"application/json"}),u=URL.createObjectURL(b),a=document.createElement("a");a.href=u;a.download="celestia-profiles.json";a.click()}}>↓ Export</Btn>
+              <label style={{padding:"6px 12px",borderRadius:8,background:TH.bgCard,color:TH.textMuted,border:`1px solid ${TH.border}`,fontSize:12,fontFamily:FONT,cursor:"pointer"}}>↑ Import<input type="file" accept=".json" style={{display:"none"}} onChange={e=>{const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=ev=>{try{const imp=JSON.parse(ev.target.result);if(Array.isArray(imp)){const m=[...profiles,...imp.filter(p=>!profiles.find(ep=>ep.name===p.name))];saveP(m)}}catch{}};r.readAsText(f)}}/></label>
+            </div>
+          </div>
+        )}
 
-        /* ── SYNASTRY ── */
-        , page==="synastry"&&(
-          React.createElement('div', { style: {maxWidth:700},}
-            , React.createElement('h2', { style: {fontFamily:FONT_D,fontSize:26,fontWeight:400,color:TH.lavender,marginBottom:6},}, "Synastry · Compatibility"  )
-            , React.createElement('p', { style: {color:TH.textDim,fontSize:12,marginBottom:20},}, "Compare two charts to analyze relationship dynamics."      )
-            , profiles.length<2?React.createElement('div', { style: {color:TH.textMuted,fontSize:13,padding:20,background:TH.bgCard,borderRadius:12},}, "Save at least 2 profiles to use synastry. "        , React.createElement(Btn, { small: true, onClick: ()=>setPage("newchart"), theme: TH, style: {marginLeft:8},}, "Create Profile" )):(
-              React.createElement('div', null
-                , React.createElement('div', { style: {display:"grid",gridTemplateColumns:"1fr 1fr",gap:12,marginBottom:20},}
-                  , [{label:"Person 1",val:active,set:bd=>{go(bd)}},{label:"Person 2",val:chart2?profiles.find(p=>p.name===chart2._name):null,set:bd=>{const c=genChart(bd,hsys,zsys);c._name=bd.name;setChart2(c);if(chart)setSynAspects(calcSynastry(chart,c))}}].map((side,idx)=>(
-                    React.createElement('div', { key: idx,}
-                      , React.createElement('div', { style: {fontSize:10,letterSpacing:2,color:TH.textDim,textTransform:"uppercase",marginBottom:6},}, side.label)
-                      , React.createElement('div', { style: {display:"flex",flexDirection:"column",gap:4},}
-                        , profiles.map((p,i)=>React.createElement('button', { key: i, onClick: ()=>side.set(p), style: {padding:"8px 12px",borderRadius:8,background:((idx===0&&_optionalChain([active, 'optionalAccess', _233 => _233.name])===p.name)||(idx===1&&chart2&&chart2._name===p.name))?TH.accentSoft:TH.bgCard,color:((idx===0&&_optionalChain([active, 'optionalAccess', _234 => _234.name])===p.name)||(idx===1&&chart2&&chart2._name===p.name))?TH.accent:TH.textMuted,border:`1px solid ${TH.borderLight}`,fontSize:12,fontFamily:FONT,cursor:"pointer",textAlign:"left"},}, p.name))
-                      )
-                    )
-                  ))
-                )
-                , synAspects&&(
-                  React.createElement('div', null
-                    , React.createElement('div', { style: {fontSize:12,color:TH.accent,fontWeight:600,marginBottom:10},}, "Cross-Chart Aspects ("  , synAspects.length, ")")
-                    , React.createElement('div', { style: {display:"flex",flexDirection:"column",gap:3},}
-                      , synAspects.slice(0,30).map((a,i)=>{const pp1=PLANETS.find(p=>p.key===a.p1),pp2=PLANETS.find(p=>p.key===a.p2);return(
-                        React.createElement('div', { key: i, style: {display:"flex",alignItems:"center",gap:6,padding:"6px 10px",borderRadius:6,background:a.exact?`${TH.accent}08`:"transparent",fontSize:12},}
-                          , React.createElement('span', { style: {color:_optionalChain([pp1, 'optionalAccess', _235 => _235.color]),fontSize:14},}, _optionalChain([pp1, 'optionalAccess', _236 => _236.sym]))
-                          , React.createElement('span', { style: {color:TH.textMuted,width:55,fontSize:11},}, "P1 " , _optionalChain([pp1, 'optionalAccess', _237 => _237.name]))
-                          , React.createElement('span', { style: {color:a.asp.color,fontSize:14},}, a.asp.sym)
-                          , React.createElement('span', { style: {color:a.asp.color,width:70,fontSize:11},}, a.asp.name)
-                          , React.createElement('span', { style: {color:_optionalChain([pp2, 'optionalAccess', _238 => _238.color]),fontSize:14},}, _optionalChain([pp2, 'optionalAccess', _239 => _239.sym]))
-                          , React.createElement('span', { style: {color:TH.textMuted,width:55,fontSize:11},}, "P2 " , _optionalChain([pp2, 'optionalAccess', _240 => _240.name]))
-                          , React.createElement('span', { style: {marginLeft:"auto",color:TH.textDim,fontSize:10},}, a.orb, "°")
-                        )
-                      )})
-                    )
-                  )
-                )
-              )
-            )
-          )
-        )
+        {/* ── SYNASTRY ── */}
+        {page==="synastry"&&(
+          <div style={{maxWidth:700}}>
+            <h2 style={{fontFamily:FONT_D,fontSize:26,fontWeight:400,color:TH.lavender,marginBottom:6}}>Synastry · Compatibility</h2>
+            <p style={{color:TH.textDim,fontSize:12,marginBottom:20}}>Compare two charts to analyze relationship dynamics.</p>
+            {profiles.length<2?<div style={{color:TH.textMuted,fontSize:13,padding:20,background:TH.bgCard,borderRadius:12}}>Save at least 2 profiles to use synastry. <Btn small onClick={()=>setPage("newchart")} theme={TH} style={{marginLeft:8}}>Create Profile</Btn></div>:(
+              <div>
+                <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:12,marginBottom:20}}>
+                  {[{label:"Person 1",val:active,set:bd=>{go(bd)}},{label:"Person 2",val:chart2?profiles.find(p=>p.name===chart2._name):null,set:bd=>{const c=genChart(bd,hsys,zsys);c._name=bd.name;setChart2(c);if(chart)setSynAspects(calcSynastry(chart,c))}}].map((side,idx)=>(
+                    <div key={idx}>
+                      <div style={{fontSize:10,letterSpacing:2,color:TH.textDim,textTransform:"uppercase",marginBottom:6}}>{side.label}</div>
+                      <div style={{display:"flex",flexDirection:"column",gap:4}}>
+                        {profiles.map((p,i)=><button key={i} onClick={()=>side.set(p)} style={{padding:"8px 12px",borderRadius:8,background:((idx===0&&active?.name===p.name)||(idx===1&&chart2&&chart2._name===p.name))?TH.accentSoft:TH.bgCard,color:((idx===0&&active?.name===p.name)||(idx===1&&chart2&&chart2._name===p.name))?TH.accent:TH.textMuted,border:`1px solid ${TH.borderLight}`,fontSize:12,fontFamily:FONT,cursor:"pointer",textAlign:"left"}}>{p.name}</button>)}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+                {synAspects&&(
+                  <div>
+                    <div style={{fontSize:12,color:TH.accent,fontWeight:600,marginBottom:10}}>Cross-Chart Aspects ({synAspects.length})</div>
+                    <div style={{display:"flex",flexDirection:"column",gap:3}}>
+                      {synAspects.slice(0,30).map((a,i)=>{const pp1=PLANETS.find(p=>p.key===a.p1),pp2=PLANETS.find(p=>p.key===a.p2);return(
+                        <div key={i} style={{display:"flex",alignItems:"center",gap:6,padding:"6px 10px",borderRadius:6,background:a.exact?`${TH.accent}08`:"transparent",fontSize:12}}>
+                          <span style={{color:pp1?.color,fontSize:14}}>{pp1?.sym}</span>
+                          <span style={{color:TH.textMuted,width:55,fontSize:11}}>P1 {pp1?.name}</span>
+                          <span style={{color:a.asp.color,fontSize:14}}>{a.asp.sym}</span>
+                          <span style={{color:a.asp.color,width:70,fontSize:11}}>{a.asp.name}</span>
+                          <span style={{color:pp2?.color,fontSize:14}}>{pp2?.sym}</span>
+                          <span style={{color:TH.textMuted,width:55,fontSize:11}}>P2 {pp2?.name}</span>
+                          <span style={{marginLeft:"auto",color:TH.textDim,fontSize:10}}>{a.orb}°</span>
+                        </div>
+                      )})}
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+        )}
 
-        /* ── TRANSITS ── */
-        , page==="transits"&&(
-          React.createElement('div', null
-            , React.createElement('div', { style: {display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:16,flexWrap:"wrap",gap:8},}
-              , React.createElement('div', null
-                , React.createElement('h2', { style: {fontFamily:FONT_D,fontSize:26,fontWeight:400,color:TH.lavender,marginBottom:6},}, tMode==="now"?"Current Transits":"12-Month Forecast")
-                , React.createElement('p', { style: {color:TH.textDim,fontSize:12},}, tMode==="now"?`Active influences on your chart · ${new Date().toLocaleDateString()}`:"Timeline of your upcoming transits")
-              )
-              , React.createElement('div', { style: {display:"flex",gap:4,background:TH.bgCard,border:`1px solid ${TH.cardBorder}`,borderRadius:8,padding:3},}
-                , React.createElement('button', { onClick: ()=>setTMode("now"), style: {padding:"6px 14px",borderRadius:6,background:tMode==="now"?TH.accentSoft:"transparent",color:tMode==="now"?TH.accent:TH.textDim,border:"none",fontSize:11,fontFamily:FONT,cursor:"pointer",fontWeight:600},}, "Now")
-                , React.createElement('button', { onClick: ()=>{setTMode("forecast");if(chart&&!tForecast)setTForecast(scanYearTransits(chart,new Date()))}, style: {padding:"6px 14px",borderRadius:6,background:tMode==="forecast"?TH.accentSoft:"transparent",color:tMode==="forecast"?TH.accent:TH.textDim,border:"none",fontSize:11,fontFamily:FONT,cursor:"pointer",fontWeight:600},}, "12 Months" )
-              )
-            )
-            , tMode==="now"&&(()=>{
+        {/* ── TRANSITS ── */}
+        {page==="transits"&&(
+          <div>
+            <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:16,flexWrap:"wrap",gap:8}}>
+              <div>
+                <h2 style={{fontFamily:FONT_D,fontSize:26,fontWeight:400,color:TH.lavender,marginBottom:6}}>{tMode==="now"?"Current Transits":"12-Month Forecast"}</h2>
+                <p style={{color:TH.textDim,fontSize:12}}>{tMode==="now"?`Active influences on your chart · ${new Date().toLocaleDateString()}`:"Timeline of your upcoming transits"}</p>
+              </div>
+              <div style={{display:"flex",gap:4,background:TH.bgCard,border:`1px solid ${TH.cardBorder}`,borderRadius:8,padding:3}}>
+                <button onClick={()=>setTMode("now")} style={{padding:"6px 14px",borderRadius:6,background:tMode==="now"?TH.accentSoft:"transparent",color:tMode==="now"?TH.accent:TH.textDim,border:"none",fontSize:11,fontFamily:FONT,cursor:"pointer",fontWeight:600}}>Now</button>
+                <button onClick={()=>{setTMode("forecast");if(chart&&!tForecast)setTForecast(scanYearTransits(chart,new Date()))}} style={{padding:"6px 14px",borderRadius:6,background:tMode==="forecast"?TH.accentSoft:"transparent",color:tMode==="forecast"?TH.accent:TH.textDim,border:"none",fontSize:11,fontFamily:FONT,cursor:"pointer",fontWeight:600}}>12 Months</button>
+              </div>
+            </div>
+            {tMode==="now"&&(()=>{
               const now=new Date();
               const JD=jd(now.getUTCFullYear(),now.getUTCMonth()+1,now.getUTCDate(),now.getUTCHours()+now.getUTCMinutes()/60);
               let pos=calcAll(JD);
               if(zsys==="sidereal"){const ay=ayanamsa(JD);const a={};for(const[k,v]of Object.entries(pos))a[k]={lon:N(v.lon-ay),rx:v.rx};pos=a}
               return (
-              React.createElement('div', null
-                /* Current positions grid */
-                , React.createElement('div', { style: {display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(180px,1fr))",gap:8,marginBottom:24},}
-                  , PLANETS.map(p=>{const ps=pos[p.key];if(!ps)return null;const sg=getSign(ps.lon);return(
-                    React.createElement('div', { key: p.key, style: {background:TH.bgCard,border:`1px solid ${TH.cardBorder}`,borderRadius:12,padding:14},}
-                      , React.createElement('div', { style: {display:"flex",alignItems:"center",gap:6,marginBottom:6},}, React.createElement('span', { style: {fontSize:20,color:p.color},}, p.sym), React.createElement('span', { style: {fontSize:13,fontWeight:600,color:TH.text},}, p.name))
-                      , React.createElement('div', { style: {display:"flex",alignItems:"center",gap:5},}, React.createElement('span', { style: {color:sg.c},}, sg.s), React.createElement('span', { style: {color:TH.textMuted,fontSize:12},}, sg.n), React.createElement('span', { style: {color:TH.textDim,fontSize:10},}, fmtDeg(ps.lon)))
-                      , ps.rx&&React.createElement('div', { style: {color:TH.rose,fontSize:10,marginTop:4},}, "℞ Retrograde" )
-                    )
-                  )})
-                )
+              <div>
+                {/* Current positions grid */}
+                <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(180px,1fr))",gap:8,marginBottom:24}}>
+                  {PLANETS.map(p=>{const ps=pos[p.key];if(!ps)return null;const sg=getSign(ps.lon);return(
+                    <div key={p.key} style={{background:TH.bgCard,border:`1px solid ${TH.cardBorder}`,borderRadius:12,padding:14}}>
+                      <div style={{display:"flex",alignItems:"center",gap:6,marginBottom:6}}><span style={{fontSize:20,color:p.color}}>{p.sym}</span><span style={{fontSize:13,fontWeight:600,color:TH.text}}>{p.name}</span></div>
+                      <div style={{display:"flex",alignItems:"center",gap:5}}><span style={{color:sg.c}}>{sg.s}</span><span style={{color:TH.textMuted,fontSize:12}}>{sg.n}</span><span style={{color:TH.textDim,fontSize:10}}>{fmtDeg(ps.lon)}</span></div>
+                      {ps.rx&&<div style={{color:TH.rose,fontSize:10,marginTop:4}}>℞ Retrograde</div>}
+                    </div>
+                  )})}
+                </div>
 
-                /* Transit insights for active natal chart */
-                , chart&&active?(()=>{
+                {/* Transit insights for active natal chart */}
+                {chart&&active?(()=>{
                   // Build list of current transit aspects, prioritizing outer planets
                   const outerPriority={Pluto:10,Neptune:9,Uranus:8,Saturn:7,Jupiter:6,Mars:5,Sun:4,Venus:3,Mercury:3,Moon:2};
                   const ta=[];
@@ -2119,281 +2043,266 @@ function Celestia(){
                   }
                   const sorted=ta.sort((a,b)=>b.weight-a.weight).slice(0,12);
                   return (
-                    React.createElement('div', null
-                      , React.createElement('div', { style: {fontSize:13,color:TH.accent,fontWeight:600,marginBottom:12,fontFamily:FONT_D},}, "✦ Active Transit Insights for "
-                             , active.name
-                      )
-                      , React.createElement('div', { style: {fontSize:11,color:TH.textDim,marginBottom:14,lineHeight:1.6},}, "The most significant current transits to your natal chart, ranked by impact. Tap any card to read the interpretation."
-
-                      )
-                      , React.createElement('div', { style: {display:"flex",flexDirection:"column",gap:8},}
-                        , sorted.map((t,i)=>{
+                    <div>
+                      <div style={{fontSize:13,color:TH.accent,fontWeight:600,marginBottom:12,fontFamily:FONT_D}}>
+                        ✦ Active Transit Insights for {active.name}
+                      </div>
+                      <div style={{fontSize:11,color:TH.textDim,marginBottom:14,lineHeight:1.6}}>
+                        The most significant current transits to your natal chart, ranked by impact. Tap any card to read the interpretation.
+                      </div>
+                      <div style={{display:"flex",flexDirection:"column",gap:8}}>
+                        {sorted.map((t,i)=>{
                           const reading=getTransitReading(t.tp.name,t.asp,t.np.name,t.tSign.n,t.tRx);
                           const isExp=tExp===i;
                           return (
-                            React.createElement('div', { key: i, style: {background:TH.bgCard,borderRadius:10,border:`1px solid ${isExp?TH.accent+"40":TH.cardBorder}`,overflow:"hidden",transition:"border 0.15s"},}
-                              , React.createElement('button', { onClick: ()=>setTExp(isExp?null:i), style: {width:"100%",padding:"12px 14px",display:"flex",alignItems:"flex-start",gap:10,background:"none",border:"none",color:TH.text,cursor:"pointer",textAlign:"left",fontFamily:FONT},}
-                                , React.createElement('div', { style: {width:6,height:6,borderRadius:3,background:t.tp.color,flexShrink:0,marginTop:6},})
-                                , React.createElement('div', { style: {flex:1,minWidth:0},}
-                                  , React.createElement('div', { style: {display:"flex",alignItems:"center",gap:6,flexWrap:"wrap"},}
-                                    , React.createElement('span', { style: {color:t.tp.color,fontWeight:600,fontSize:14},}, t.tp.sym, " " , t.tp.name)
-                                    , React.createElement('span', { style: {color:t.asp.color,fontWeight:600,fontSize:13},}, t.asp.sym)
-                                    , React.createElement('span', { style: {color:TH.text,fontWeight:600,fontSize:14},}, t.np.sym, " " , t.np.name)
-                                    , reading.isSpecial&&React.createElement('span', { style: {fontSize:11,color:TH.accent},}, "★ Milestone" )
-                                    , t.tRx&&React.createElement('span', { style: {fontSize:10,color:TH.rose},}, "℞")
-                                  )
-                                  , React.createElement('div', { style: {fontSize:10,color:TH.textDim,marginTop:3,display:"flex",gap:8},}
-                                    , React.createElement('span', null, t.asp.name)
-                                    , React.createElement('span', null, "orb " , t.orb, "°")
-                                    , React.createElement('span', null, "transit in "  , t.tSign.n)
-                                  )
-                                  , !isExp&&React.createElement('div', { style: {fontSize:11,color:TH.textMuted,marginTop:6,lineHeight:1.5,fontStyle:"italic"},}, reading.body.substring(0,110), "…")
-                                )
-                                , React.createElement('span', { style: {color:TH.textDim,fontSize:12,marginTop:3,transition:"transform 0.15s",transform:isExp?"rotate(180deg)":"rotate(0)"},}, "▾")
-                              )
-                              , isExp&&(
-                                React.createElement('div', { style: {padding:"0 14px 14px 30px",borderTop:`1px solid ${TH.border}`},}
-                                  , React.createElement('div', { style: {marginTop:10,fontSize:13,lineHeight:1.75,color:TH.text},}, reading.body)
-                                  , React.createElement('div', { style: {marginTop:10,fontSize:10,color:TH.textDim,display:"flex",gap:12,flexWrap:"wrap"},}
-                                    , React.createElement('span', null, "Transit: " , t.tp.sym, " " , fmtDeg(pos[t.tp.key].lon), " " , t.tSign.n)
-                                    , React.createElement('span', null, "Natal: " , t.np.sym, " " , fmtDeg(chart.pos[t.np.key].lon), " " , t.nSign.n)
-                                  )
-                                )
-                              )
-                            )
+                            <div key={i} style={{background:TH.bgCard,borderRadius:10,border:`1px solid ${isExp?TH.accent+"40":TH.cardBorder}`,overflow:"hidden",transition:"border 0.15s"}}>
+                              <button onClick={()=>setTExp(isExp?null:i)} style={{width:"100%",padding:"12px 14px",display:"flex",alignItems:"flex-start",gap:10,background:"none",border:"none",color:TH.text,cursor:"pointer",textAlign:"left",fontFamily:FONT}}>
+                                <div style={{width:6,height:6,borderRadius:3,background:t.tp.color,flexShrink:0,marginTop:6}}/>
+                                <div style={{flex:1,minWidth:0}}>
+                                  <div style={{display:"flex",alignItems:"center",gap:6,flexWrap:"wrap"}}>
+                                    <span style={{color:t.tp.color,fontWeight:600,fontSize:14}}>{t.tp.sym} {t.tp.name}</span>
+                                    <span style={{color:t.asp.color,fontWeight:600,fontSize:13}}>{t.asp.sym}</span>
+                                    <span style={{color:TH.text,fontWeight:600,fontSize:14}}>{t.np.sym} {t.np.name}</span>
+                                    {reading.isSpecial&&<span style={{fontSize:11,color:TH.accent}}>★ Milestone</span>}
+                                    {t.tRx&&<span style={{fontSize:10,color:TH.rose}}>℞</span>}
+                                  </div>
+                                  <div style={{fontSize:10,color:TH.textDim,marginTop:3,display:"flex",gap:8}}>
+                                    <span>{t.asp.name}</span>
+                                    <span>orb {t.orb}°</span>
+                                    <span>transit in {t.tSign.n}</span>
+                                  </div>
+                                  {!isExp&&<div style={{fontSize:11,color:TH.textMuted,marginTop:6,lineHeight:1.5,fontStyle:"italic"}}>{reading.body.substring(0,110)}…</div>}
+                                </div>
+                                <span style={{color:TH.textDim,fontSize:12,marginTop:3,transition:"transform 0.15s",transform:isExp?"rotate(180deg)":"rotate(0)"}}>▾</span>
+                              </button>
+                              {isExp&&(
+                                <div style={{padding:"0 14px 14px 30px",borderTop:`1px solid ${TH.border}`}}>
+                                  <div style={{marginTop:10,fontSize:13,lineHeight:1.75,color:TH.text}}>{reading.body}</div>
+                                  <div style={{marginTop:10,fontSize:10,color:TH.textDim,display:"flex",gap:12,flexWrap:"wrap"}}>
+                                    <span>Transit: {t.tp.sym} {fmtDeg(pos[t.tp.key].lon)} {t.tSign.n}</span>
+                                    <span>Natal: {t.np.sym} {fmtDeg(chart.pos[t.np.key].lon)} {t.nSign.n}</span>
+                                  </div>
+                                </div>
+                              )}
+                            </div>
                           );
-                        })
-                      )
-                      , sorted.length===0&&React.createElement('div', { style: {padding:20,textAlign:"center",color:TH.textDim,fontSize:12},}, "No major transits in tight orb right now. Check back in a few weeks."             )
-                    )
+                        })}
+                      </div>
+                      {sorted.length===0&&<div style={{padding:20,textAlign:"center",color:TH.textDim,fontSize:12}}>No major transits in tight orb right now. Check back in a few weeks.</div>}
+                    </div>
                   );
                 })():(
-                  React.createElement('div', { style: {padding:24,textAlign:"center",color:TH.textDim,fontSize:12,background:TH.bgCard,borderRadius:12,border:`1px solid ${TH.cardBorder}`},}, "Load a birth chart to see personalized transit insights."
-
-                  )
-                )
-              )
-            )})()
-            , tMode==="forecast"&&(()=>{
-              if(!chart||!active) return React.createElement('div', { style: {padding:24,textAlign:"center",color:TH.textDim,fontSize:12,background:TH.bgCard,borderRadius:12,border:`1px solid ${TH.cardBorder}`},}, "Load a birth chart to see your 12-month forecast."        );
-              if(!tForecast) return React.createElement('div', { style: {padding:24,textAlign:"center",color:TH.textDim,fontSize:12},}, "Generating forecast..." );
+                  <div style={{padding:24,textAlign:"center",color:TH.textDim,fontSize:12,background:TH.bgCard,borderRadius:12,border:`1px solid ${TH.cardBorder}`}}>
+                    Load a birth chart to see personalized transit insights.
+                  </div>
+                )}
+              </div>
+            )})()}
+            {tMode==="forecast"&&(()=>{
+              if(!chart||!active) return <div style={{padding:24,textAlign:"center",color:TH.textDim,fontSize:12,background:TH.bgCard,borderRadius:12,border:`1px solid ${TH.cardBorder}`}}>Load a birth chart to see your 12-month forecast.</div>;
+              if(!tForecast) return <div style={{padding:24,textAlign:"center",color:TH.textDim,fontSize:12}}>Generating forecast...</div>;
               const maxI=Math.max(...tForecast.map(m=>m.intensity),1);
               const cur=tForecast[tSelMonth];
               return (
-                React.createElement('div', null
-                  , React.createElement('div', { style: {background:TH.bgCard,border:`1px solid ${TH.cardBorder}`,borderRadius:12,padding:16,marginBottom:16},}
-                    , React.createElement('div', { style: {fontSize:10,letterSpacing:2,color:TH.textDim,textTransform:"uppercase",marginBottom:10},}, "Transit Intensity · Next 12 Months"     )
-                    , React.createElement('div', { style: {display:"flex",alignItems:"flex-end",gap:4,height:80,marginBottom:6},}
-                      , tForecast.map((m,i)=>{
+                <div>
+                  <div style={{background:TH.bgCard,border:`1px solid ${TH.cardBorder}`,borderRadius:12,padding:16,marginBottom:16}}>
+                    <div style={{fontSize:10,letterSpacing:2,color:TH.textDim,textTransform:"uppercase",marginBottom:10}}>Transit Intensity · Next 12 Months</div>
+                    <div style={{display:"flex",alignItems:"flex-end",gap:4,height:80,marginBottom:6}}>
+                      {tForecast.map((m,i)=>{
                         const h=Math.max(6,(m.intensity/maxI)*70);
                         const act=i===tSelMonth;
                         const hasSpecial=m.transits.some(t=>SPECIAL_IX[t.tb.name+"-"+t.asp.name+"-"+t.np.name]);
                         return (
-                          React.createElement('button', { key: i, onClick: ()=>{setTSelMonth(i);setTExp(0)}, style: {flex:1,display:"flex",flexDirection:"column",alignItems:"center",gap:3,background:"none",border:"none",cursor:"pointer",padding:0},}
-                            , React.createElement('div', { style: {width:"100%",height:h,borderRadius:3,background:act?TH.accent:hasSpecial?TH.accent+"60":TH.accent+"25",transition:"all 0.15s",position:"relative"},}
-                              , hasSpecial&&React.createElement('div', { style: {position:"absolute",top:-5,left:"50%",transform:"translateX(-50%)",width:5,height:5,borderRadius:3,background:TH.accent},})
-                            )
-                            , React.createElement('span', { style: {fontSize:9,color:act?TH.accent:TH.textMuted,fontWeight:act?600:400},}, m.shortLabel)
-                          )
+                          <button key={i} onClick={()=>{setTSelMonth(i);setTExp(0)}} style={{flex:1,display:"flex",flexDirection:"column",alignItems:"center",gap:3,background:"none",border:"none",cursor:"pointer",padding:0}}>
+                            <div style={{width:"100%",height:h,borderRadius:3,background:act?TH.accent:hasSpecial?TH.accent+"60":TH.accent+"25",transition:"all 0.15s",position:"relative"}}>
+                              {hasSpecial&&<div style={{position:"absolute",top:-5,left:"50%",transform:"translateX(-50%)",width:5,height:5,borderRadius:3,background:TH.accent}}/>}
+                            </div>
+                            <span style={{fontSize:9,color:act?TH.accent:TH.textMuted,fontWeight:act?600:400}}>{m.shortLabel}</span>
+                          </button>
                         );
-                      })
-                    )
-                    , React.createElement('div', { style: {fontSize:9,color:TH.textDim,textAlign:"center"},}, "Tap a month for details · ★ = milestone transit"         )
-                  )
-                  , React.createElement('div', { style: {marginBottom:12},}
-                    , React.createElement('div', { style: {fontFamily:FONT_D,fontSize:22,fontWeight:500,color:TH.text,marginBottom:2},}, cur.label)
-                    , React.createElement('div', { style: {fontSize:11,color:TH.textDim,marginBottom:10},}, cur.transits.length, " significant transit"  , cur.transits.length!==1?"s":"")
-                    , React.createElement('div', { style: {padding:"10px 12px",background:TH.bgCard,borderRadius:10,border:`1px solid ${TH.cardBorder}`,fontSize:12,color:TH.textMuted,lineHeight:1.65,fontStyle:"italic"},}, monthNarrative(cur))
-                  )
-                  , cur.transits.length===0?React.createElement('div', { style: {padding:20,textAlign:"center",color:TH.textMuted,fontSize:12},}, "A quieter month."  ):(
-                    React.createElement('div', { style: {display:"flex",flexDirection:"column",gap:6},}
-                      , cur.transits.slice(0,10).map((t,i)=>{
+                      })}
+                    </div>
+                    <div style={{fontSize:9,color:TH.textDim,textAlign:"center"}}>Tap a month for details · ★ = milestone transit</div>
+                  </div>
+                  <div style={{marginBottom:12}}>
+                    <div style={{fontFamily:FONT_D,fontSize:22,fontWeight:500,color:TH.text,marginBottom:2}}>{cur.label}</div>
+                    <div style={{fontSize:11,color:TH.textDim,marginBottom:10}}>{cur.transits.length} significant transit{cur.transits.length!==1?"s":""}</div>
+                    <div style={{padding:"10px 12px",background:TH.bgCard,borderRadius:10,border:`1px solid ${TH.cardBorder}`,fontSize:12,color:TH.textMuted,lineHeight:1.65,fontStyle:"italic"}}>{monthNarrative(cur)}</div>
+                  </div>
+                  {cur.transits.length===0?<div style={{padding:20,textAlign:"center",color:TH.textMuted,fontSize:12}}>A quieter month.</div>:(
+                    <div style={{display:"flex",flexDirection:"column",gap:6}}>
+                      {cur.transits.slice(0,10).map((t,i)=>{
                         const reading=getTransitReading(t.tb.name,t.asp,t.np.name,t.tSign.n,t.tRx);
                         const isExp=tExp===i;
                         return (
-                          React.createElement('div', { key: i, style: {background:TH.bgCard,borderRadius:10,border:`1px solid ${isExp?TH.accent+"40":TH.cardBorder}`,overflow:"hidden"},}
-                            , React.createElement('button', { onClick: ()=>setTExp(isExp?null:i), style: {width:"100%",padding:"12px 14px",display:"flex",alignItems:"flex-start",gap:10,background:"none",border:"none",color:TH.text,cursor:"pointer",textAlign:"left",fontFamily:FONT},}
-                              , React.createElement('div', { style: {width:6,height:6,borderRadius:3,background:t.tb.color,flexShrink:0,marginTop:6},})
-                              , React.createElement('div', { style: {flex:1,minWidth:0},}
-                                , React.createElement('div', { style: {display:"flex",alignItems:"center",gap:6,flexWrap:"wrap"},}
-                                  , React.createElement('span', { style: {color:t.tb.color,fontWeight:600,fontSize:14},}, t.tb.sym, " " , t.tb.name)
-                                  , React.createElement('span', { style: {color:t.asp.color,fontWeight:600,fontSize:13},}, t.asp.sym)
-                                  , React.createElement('span', { style: {color:TH.text,fontWeight:600,fontSize:14},}, t.np.sym, " " , t.np.name)
-                                  , reading.isSpecial&&React.createElement('span', { style: {fontSize:11,color:TH.accent},}, "★")
-                                  , t.tRx&&React.createElement('span', { style: {fontSize:10,color:TH.rose},}, "℞")
-                                )
-                                , React.createElement('div', { style: {fontSize:10,color:TH.textDim,marginTop:3,display:"flex",gap:8,flexWrap:"wrap"},}
-                                  , React.createElement('span', null, "Peak ~" , t.peakDate), React.createElement('span', null, "orb " , t.orb, "°"), React.createElement('span', null, t.asp.name)
-                                )
-                                , !isExp&&React.createElement('div', { style: {fontSize:11,color:TH.textMuted,marginTop:6,lineHeight:1.5,fontStyle:"italic"},}, reading.body.substring(0,110), "…")
-                              )
-                              , React.createElement('span', { style: {color:TH.textDim,fontSize:12,marginTop:3,transform:isExp?"rotate(180deg)":"rotate(0)"},}, "▾")
-                            )
-                            , isExp&&React.createElement('div', { style: {padding:"0 14px 14px 30px",borderTop:`1px solid ${TH.border}`},}, React.createElement('div', { style: {marginTop:10,fontSize:13,lineHeight:1.75,color:TH.text},}, reading.body))
-                          )
+                          <div key={i} style={{background:TH.bgCard,borderRadius:10,border:`1px solid ${isExp?TH.accent+"40":TH.cardBorder}`,overflow:"hidden"}}>
+                            <button onClick={()=>setTExp(isExp?null:i)} style={{width:"100%",padding:"12px 14px",display:"flex",alignItems:"flex-start",gap:10,background:"none",border:"none",color:TH.text,cursor:"pointer",textAlign:"left",fontFamily:FONT}}>
+                              <div style={{width:6,height:6,borderRadius:3,background:t.tb.color,flexShrink:0,marginTop:6}}/>
+                              <div style={{flex:1,minWidth:0}}>
+                                <div style={{display:"flex",alignItems:"center",gap:6,flexWrap:"wrap"}}>
+                                  <span style={{color:t.tb.color,fontWeight:600,fontSize:14}}>{t.tb.sym} {t.tb.name}</span>
+                                  <span style={{color:t.asp.color,fontWeight:600,fontSize:13}}>{t.asp.sym}</span>
+                                  <span style={{color:TH.text,fontWeight:600,fontSize:14}}>{t.np.sym} {t.np.name}</span>
+                                  {reading.isSpecial&&<span style={{fontSize:11,color:TH.accent}}>★</span>}
+                                  {t.tRx&&<span style={{fontSize:10,color:TH.rose}}>℞</span>}
+                                </div>
+                                <div style={{fontSize:10,color:TH.textDim,marginTop:3,display:"flex",gap:8,flexWrap:"wrap"}}>
+                                  <span>Peak ~{t.peakDate}</span><span>orb {t.orb}°</span><span>{t.asp.name}</span>
+                                </div>
+                                {!isExp&&<div style={{fontSize:11,color:TH.textMuted,marginTop:6,lineHeight:1.5,fontStyle:"italic"}}>{reading.body.substring(0,110)}…</div>}
+                              </div>
+                              <span style={{color:TH.textDim,fontSize:12,marginTop:3,transform:isExp?"rotate(180deg)":"rotate(0)"}}>▾</span>
+                            </button>
+                            {isExp&&<div style={{padding:"0 14px 14px 30px",borderTop:`1px solid ${TH.border}`}}><div style={{marginTop:10,fontSize:13,lineHeight:1.75,color:TH.text}}>{reading.body}</div></div>}
+                          </div>
                         );
-                      })
-                    )
-                  )
-                )
+                      })}
+                    </div>
+                  )}
+                </div>
               );
-            })()
-          )
-        )
+            })()}
+          </div>
+        )}
 
-        /* ── PROGRESSIONS ── */
-        , page==="progressions"&&(
-          React.createElement('div', { style: {maxWidth:600},}
-            , React.createElement('h2', { style: {fontFamily:FONT_D,fontSize:26,fontWeight:400,color:TH.lavender,marginBottom:6},}, "Secondary Progressions" )
-            , React.createElement('p', { style: {color:TH.textDim,fontSize:12,marginBottom:16},}, "A day for a year: each day after birth represents a year of life."             )
-            , !active?React.createElement('div', { style: {color:TH.textMuted,fontSize:13,padding:20,background:TH.bgCard,borderRadius:12},}, "Generate a natal chart first."    ):(
-              React.createElement('div', null
-                , React.createElement('div', { style: {display:"flex",gap:8,alignItems:"center",marginBottom:16},}
-                  , React.createElement('span', { style: {fontSize:12,color:TH.textMuted},}, "Progress to year:"  )
-                  , React.createElement('input', { type: "number", value: progYear, onChange: e=>setProgYear(+e.target.value), style: {width:80,padding:"6px 10px",borderRadius:6,background:TH.inputBg,border:`1px solid ${TH.border}`,color:TH.text,fontFamily:FONT,fontSize:13,outline:"none"},})
-                  , React.createElement(Btn, { small: true, primary: true, onClick: ()=>setProgData(calcProgressions({...active,zsys},progYear)), theme: TH,}, "Calculate")
-                )
-                , progData&&(
-                  React.createElement('div', { style: {display:"flex",flexDirection:"column",gap:4},}
-                    , React.createElement('div', { style: {fontSize:10,letterSpacing:2,color:TH.accent,textTransform:"uppercase",marginBottom:6},}, "Progressed Positions — "   , progData.targetYear)
-                    , PLANETS.slice(0,10).map(p=>{const pl=progData.pl[p.key],natal=_optionalChain([chart, 'optionalAccess', _241 => _241.pl, 'access', _242 => _242[p.key]]);if(!pl)return null;const changed=natal&&natal.sign!==pl.sign;return(
-                      React.createElement('div', { key: p.key, style: {display:"flex",alignItems:"center",gap:8,padding:"6px 10px",borderRadius:6,background:changed?`${TH.accent}08`:"transparent",fontSize:12},}
-                        , React.createElement('span', { style: {color:p.color,fontSize:16},}, p.sym)
-                        , React.createElement('span', { style: {width:65,color:TH.text},}, p.name)
-                        , React.createElement('span', { style: {color:pl.signColor},}, pl.signSym)
-                        , React.createElement('span', { style: {color:TH.textMuted},}, pl.sign, " " , pl.deg)
-                        , changed&&React.createElement('span', { style: {marginLeft:"auto",color:TH.accent,fontSize:10},}, "changed from "  , natal.sign)
-                      )
-                    )})
-                  )
-                )
-              )
-            )
-          )
-        )
+        {/* ── PROGRESSIONS ── */}
+        {page==="progressions"&&(
+          <div style={{maxWidth:600}}>
+            <h2 style={{fontFamily:FONT_D,fontSize:26,fontWeight:400,color:TH.lavender,marginBottom:6}}>Secondary Progressions</h2>
+            <p style={{color:TH.textDim,fontSize:12,marginBottom:16}}>A day for a year: each day after birth represents a year of life.</p>
+            {!active?<div style={{color:TH.textMuted,fontSize:13,padding:20,background:TH.bgCard,borderRadius:12}}>Generate a natal chart first.</div>:(
+              <div>
+                <div style={{display:"flex",gap:8,alignItems:"center",marginBottom:16}}>
+                  <span style={{fontSize:12,color:TH.textMuted}}>Progress to year:</span>
+                  <input type="number" value={progYear} onChange={e=>setProgYear(+e.target.value)} style={{width:80,padding:"6px 10px",borderRadius:6,background:TH.inputBg,border:`1px solid ${TH.border}`,color:TH.text,fontFamily:FONT,fontSize:13,outline:"none"}}/>
+                  <Btn small primary onClick={()=>setProgData(calcProgressions({...active,zsys},progYear))} theme={TH}>Calculate</Btn>
+                </div>
+                {progData&&(
+                  <div style={{display:"flex",flexDirection:"column",gap:4}}>
+                    <div style={{fontSize:10,letterSpacing:2,color:TH.accent,textTransform:"uppercase",marginBottom:6}}>Progressed Positions — {progData.targetYear}</div>
+                    {PLANETS.slice(0,10).map(p=>{const pl=progData.pl[p.key],natal=chart?.pl[p.key];if(!pl)return null;const changed=natal&&natal.sign!==pl.sign;return(
+                      <div key={p.key} style={{display:"flex",alignItems:"center",gap:8,padding:"6px 10px",borderRadius:6,background:changed?`${TH.accent}08`:"transparent",fontSize:12}}>
+                        <span style={{color:p.color,fontSize:16}}>{p.sym}</span>
+                        <span style={{width:65,color:TH.text}}>{p.name}</span>
+                        <span style={{color:pl.signColor}}>{pl.signSym}</span>
+                        <span style={{color:TH.textMuted}}>{pl.sign} {pl.deg}</span>
+                        {changed&&<span style={{marginLeft:"auto",color:TH.accent,fontSize:10}}>changed from {natal.sign}</span>}
+                      </div>
+                    )})}
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+        )}
 
-        /* ── SOLAR RETURN ── */
-        , page==="solarreturn"&&(
-          React.createElement('div', { style: {maxWidth:600},}
-            , React.createElement('h2', { style: {fontFamily:FONT_D,fontSize:26,fontWeight:400,color:TH.lavender,marginBottom:6},}, "Solar Return" )
-            , React.createElement('p', { style: {color:TH.textDim,fontSize:12,marginBottom:16},}, "Your birthday chart — the cosmic snapshot for the year ahead."          )
-            , !active?React.createElement('div', { style: {color:TH.textMuted,fontSize:13,padding:20,background:TH.bgCard,borderRadius:12},}, "Generate a natal chart first."    ):(
-              React.createElement('div', null
-                , React.createElement('div', { style: {display:"flex",gap:8,alignItems:"center",marginBottom:16},}
-                  , React.createElement('span', { style: {fontSize:12,color:TH.textMuted},}, "Solar return for year:"   )
-                  , React.createElement('input', { type: "number", value: srYear, onChange: e=>setSrYear(+e.target.value), style: {width:80,padding:"6px 10px",borderRadius:6,background:TH.inputBg,border:`1px solid ${TH.border}`,color:TH.text,fontFamily:FONT,fontSize:13,outline:"none"},})
-                  , React.createElement(Btn, { small: true, primary: true, onClick: ()=>setSrData(genChart({...active,year:srYear},hsys,zsys)), theme: TH,}, "Calculate")
-                )
-                , srData&&(
-                  React.createElement('div', { style: {display:"flex",gap:20,flexWrap:"wrap"},}
-                    , React.createElement('div', { style: {flexShrink:0},}, React.createElement(Wheel, { chart: srData, size: 320, theme: TH, zsys: zsys,}))
-                    , React.createElement('div', { style: {flex:1,minWidth:200},}
-                      , React.createElement('div', { style: {fontSize:10,letterSpacing:2,color:TH.accent,textTransform:"uppercase",marginBottom:8},}, "Solar Return "  , srYear, " Placements" )
-                      , PLANETS.slice(0,10).map(p=>{const pl=srData.pl[p.key];if(!pl)return null;return(
-                        React.createElement('div', { key: p.key, style: {display:"flex",alignItems:"center",gap:6,padding:"4px 0",borderBottom:`1px solid ${TH.borderLight}`,fontSize:11},}
-                          , React.createElement('span', { style: {color:p.color,fontSize:14},}, p.sym)
-                          , React.createElement('span', { style: {width:55,color:TH.text},}, p.name)
-                          , React.createElement('span', { style: {color:pl.signColor},}, pl.signSym)
-                          , React.createElement('span', { style: {color:TH.textMuted,flex:1},}, pl.sign, " " , pl.deg)
-                          , React.createElement('span', { style: {color:TH.textDim,fontSize:10},}, "H", pl.house)
-                        )
-                      )})
-                    )
-                  )
-                )
-              )
-            )
-          )
-        )
+        {/* ── SOLAR RETURN ── */}
+        {page==="solarreturn"&&(
+          <div style={{maxWidth:600}}>
+            <h2 style={{fontFamily:FONT_D,fontSize:26,fontWeight:400,color:TH.lavender,marginBottom:6}}>Solar Return</h2>
+            <p style={{color:TH.textDim,fontSize:12,marginBottom:16}}>Your birthday chart — the cosmic snapshot for the year ahead.</p>
+            {!active?<div style={{color:TH.textMuted,fontSize:13,padding:20,background:TH.bgCard,borderRadius:12}}>Generate a natal chart first.</div>:(
+              <div>
+                <div style={{display:"flex",gap:8,alignItems:"center",marginBottom:16}}>
+                  <span style={{fontSize:12,color:TH.textMuted}}>Solar return for year:</span>
+                  <input type="number" value={srYear} onChange={e=>setSrYear(+e.target.value)} style={{width:80,padding:"6px 10px",borderRadius:6,background:TH.inputBg,border:`1px solid ${TH.border}`,color:TH.text,fontFamily:FONT,fontSize:13,outline:"none"}}/>
+                  <Btn small primary onClick={()=>setSrData(genChart({...active,year:srYear},hsys,zsys))} theme={TH}>Calculate</Btn>
+                </div>
+                {srData&&(
+                  <div style={{display:"flex",gap:20,flexWrap:"wrap"}}>
+                    <div style={{flexShrink:0}}><Wheel chart={srData} size={320} theme={TH} zsys={zsys}/></div>
+                    <div style={{flex:1,minWidth:200}}>
+                      <div style={{fontSize:10,letterSpacing:2,color:TH.accent,textTransform:"uppercase",marginBottom:8}}>Solar Return {srYear} Placements</div>
+                      {PLANETS.slice(0,10).map(p=>{const pl=srData.pl[p.key];if(!pl)return null;return(
+                        <div key={p.key} style={{display:"flex",alignItems:"center",gap:6,padding:"4px 0",borderBottom:`1px solid ${TH.borderLight}`,fontSize:11}}>
+                          <span style={{color:p.color,fontSize:14}}>{p.sym}</span>
+                          <span style={{width:55,color:TH.text}}>{p.name}</span>
+                          <span style={{color:pl.signColor}}>{pl.signSym}</span>
+                          <span style={{color:TH.textMuted,flex:1}}>{pl.sign} {pl.deg}</span>
+                          <span style={{color:TH.textDim,fontSize:10}}>H{pl.house}</span>
+                        </div>
+                      )})}
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+        )}
 
-        /* ── EPHEMERIS ── */
-        , page==="ephemeris"&&(
-          React.createElement('div', null
-            , React.createElement('h2', { style: {fontFamily:FONT_D,fontSize:26,fontWeight:400,color:TH.lavender,marginBottom:6},}, "Ephemeris")
-            , React.createElement('p', { style: {color:TH.textDim,fontSize:12,marginBottom:16},}, "Daily planetary positions."  )
-            , React.createElement('div', { style: {display:"flex",gap:8,alignItems:"center",marginBottom:16,flexWrap:"wrap"},}
-              , React.createElement('select', { value: ephMonth, onChange: e=>setEphMonth(+e.target.value), style: {padding:"6px 10px",borderRadius:6,background:TH.inputBg,border:`1px solid ${TH.border}`,color:TH.text,fontFamily:FONT,fontSize:12,outline:"none"},}
-                , ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"].map((m,i)=>React.createElement('option', { key: i, value: i+1,}, m))
-              )
-              , React.createElement('input', { type: "number", value: ephYear, onChange: e=>setEphYear(+e.target.value), style: {width:75,padding:"6px 10px",borderRadius:6,background:TH.inputBg,border:`1px solid ${TH.border}`,color:TH.text,fontFamily:FONT,fontSize:12,outline:"none"},})
-            )
-            , React.createElement('div', { style: {overflowX:"auto"},}
-              , React.createElement('table', { style: {borderCollapse:"collapse",fontSize:10,fontFamily:FONT,width:"100%",minWidth:700},}
-                , React.createElement('thead', null, React.createElement('tr', { style: {borderBottom:`1px solid ${TH.border}`},}
-                  , React.createElement('th', { style: {padding:"6px 8px",textAlign:"left",color:TH.textDim},}, "Day")
-                  , PLANETS.slice(0,10).map(p=>React.createElement('th', { key: p.key, style: {padding:"6px 4px",textAlign:"center",color:p.color},}, p.sym))
-                ))
-                , React.createElement('tbody', null
-                  , genEphemeris(ephYear,ephMonth,zsys).map(row=>(
-                    React.createElement('tr', { key: row.day, style: {borderBottom:`1px solid ${TH.borderLight}`},}
-                      , React.createElement('td', { style: {padding:"5px 8px",color:TH.text,fontWeight:600},}, row.day)
-                      , PLANETS.slice(0,10).map(p=>{const d=row[p.key];return (React.createElement('td', { key: p.key, style: {padding:"5px 4px",textAlign:"center",color:TH.textMuted,whiteSpace:"nowrap"},}, d?React.createElement(React.Fragment, null, React.createElement('span', { style: {color:getSign(d.lon).c},}, d.sign), " " , React.createElement('span', null, d.deg), d.rx&&React.createElement('span', { style: {color:TH.rose},}, " ℞" )):"—"))})
-                    )
-                  ))
-                )
-              )
-            )
-          )
-        )
+        {/* ── EPHEMERIS ── */}
+        {page==="ephemeris"&&(
+          <div>
+            <h2 style={{fontFamily:FONT_D,fontSize:26,fontWeight:400,color:TH.lavender,marginBottom:6}}>Ephemeris</h2>
+            <p style={{color:TH.textDim,fontSize:12,marginBottom:16}}>Daily planetary positions.</p>
+            <div style={{display:"flex",gap:8,alignItems:"center",marginBottom:16,flexWrap:"wrap"}}>
+              <select value={ephMonth} onChange={e=>setEphMonth(+e.target.value)} style={{padding:"6px 10px",borderRadius:6,background:TH.inputBg,border:`1px solid ${TH.border}`,color:TH.text,fontFamily:FONT,fontSize:12,outline:"none"}}>
+                {["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"].map((m,i)=><option key={i} value={i+1}>{m}</option>)}
+              </select>
+              <input type="number" value={ephYear} onChange={e=>setEphYear(+e.target.value)} style={{width:75,padding:"6px 10px",borderRadius:6,background:TH.inputBg,border:`1px solid ${TH.border}`,color:TH.text,fontFamily:FONT,fontSize:12,outline:"none"}}/>
+            </div>
+            <div style={{overflowX:"auto"}}>
+              <table style={{borderCollapse:"collapse",fontSize:10,fontFamily:FONT,width:"100%",minWidth:700}}>
+                <thead><tr style={{borderBottom:`1px solid ${TH.border}`}}>
+                  <th style={{padding:"6px 8px",textAlign:"left",color:TH.textDim}}>Day</th>
+                  {PLANETS.slice(0,10).map(p=><th key={p.key} style={{padding:"6px 4px",textAlign:"center",color:p.color}}>{p.sym}</th>)}
+                </tr></thead>
+                <tbody>
+                  {genEphemeris(ephYear,ephMonth,zsys).map(row=>(
+                    <tr key={row.day} style={{borderBottom:`1px solid ${TH.borderLight}`}}>
+                      <td style={{padding:"5px 8px",color:TH.text,fontWeight:600}}>{row.day}</td>
+                      {PLANETS.slice(0,10).map(p=>{const d=row[p.key];return (<td key={p.key} style={{padding:"5px 4px",textAlign:"center",color:TH.textMuted,whiteSpace:"nowrap"}}>{d?<><span style={{color:getSign(d.lon).c}}>{d.sign}</span> <span>{d.deg}</span>{d.rx&&<span style={{color:TH.rose}}> ℞</span>}</>:"—"}</td>)})}
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        )}
 
-        /* ── SETTINGS ── */
-        , page==="settings"&&(
-          React.createElement('div', { style: {maxWidth:480},}
-            , React.createElement('h2', { style: {fontFamily:FONT_D,fontSize:26,fontWeight:400,color:TH.lavender,marginBottom:20},}, "Settings")
-            , React.createElement('div', { style: {display:"flex",flexDirection:"column",gap:16},}
-              , React.createElement('div', null
-                , React.createElement('div', { style: {fontSize:10,letterSpacing:2,color:TH.textDim,textTransform:"uppercase",marginBottom:6},}, "Theme")
-                , React.createElement('div', { style: {display:"flex",gap:6},}
-                  , ["dark","light"].map(t=>React.createElement('button', { key: t, onClick: ()=>setThemeId(t), style: {flex:1,padding:10,borderRadius:8,background:themeId===t?TH.accentSoft:TH.bgCard,color:themeId===t?TH.accent:TH.textMuted,border:`1px solid ${themeId===t?TH.accent+"40":TH.borderLight}`,fontFamily:FONT,fontSize:13,cursor:"pointer",fontWeight:600,textTransform:"capitalize"},}, t==="dark"?"☽ Dark":"☀ Light"))
-                )
-              )
-              , React.createElement('div', null
-                , React.createElement('div', { style: {fontSize:10,letterSpacing:2,color:TH.textDim,textTransform:"uppercase",marginBottom:6},}, "Zodiac System" )
-                , React.createElement('div', { style: {display:"flex",gap:6},}
-                  , ["tropical","sidereal"].map(s=>React.createElement('button', { key: s, onClick: ()=>{setZsys(s);reCalc(hsys,s)}, style: {flex:1,padding:10,borderRadius:8,background:zsys===s?TH.accentSoft:TH.bgCard,color:zsys===s?TH.accent:TH.textMuted,border:`1px solid ${zsys===s?TH.accent+"40":TH.borderLight}`,fontFamily:FONT,fontSize:13,cursor:"pointer",fontWeight:600},}, s==="tropical"?"♈ Western Tropical":"☸ Vedic Sidereal"))
-                )
-              )
-              , React.createElement('div', null
-                , React.createElement('div', { style: {fontSize:10,letterSpacing:2,color:TH.textDim,textTransform:"uppercase",marginBottom:6},}, "House System" )
-                , React.createElement('div', { style: {display:"grid",gridTemplateColumns:"1fr 1fr",gap:6},}
-                  , HSYS.map(h=>React.createElement('button', { key: h.id, onClick: ()=>{setHsys(h.id);reCalc(h.id,zsys)}, style: {padding:10,borderRadius:8,background:hsys===h.id?TH.accentSoft:TH.bgCard,color:hsys===h.id?TH.accent:TH.textMuted,border:`1px solid ${hsys===h.id?TH.accent+"40":TH.borderLight}`,fontFamily:FONT,fontSize:12,cursor:"pointer",textAlign:"left"},}, React.createElement('div', { style: {fontWeight:600},}, h.n), React.createElement('div', { style: {fontSize:10,color:TH.textDim,marginTop:1},}, h.d)))
-                )
-              )
-              , React.createElement('div', null
-                , React.createElement('div', { style: {fontSize:10,letterSpacing:2,color:TH.textDim,textTransform:"uppercase",marginBottom:6},}, "AI Integration (Optional)"  )
-                , React.createElement('div', { style: {background:TH.bgCard,border:`1px solid ${TH.cardBorder}`,borderRadius:12,padding:14},}
-                  , React.createElement('div', { style: {fontSize:12,color:TH.textMuted,lineHeight:1.6},}, "To enable AI-powered interpretations, add your API key below. Readings are generated locally — your data never leaves your machine."                   )
-                  , React.createElement('input', { placeholder: "API Key (optional)"  , style: {width:"100%",marginTop:8,padding:"8px 12px",borderRadius:6,background:TH.inputBg,border:`1px solid ${TH.border}`,color:TH.text,fontFamily:FONT,fontSize:12,outline:"none"},})
-                )
-              )
-              , React.createElement('div', null
-                , React.createElement('div', { style: {fontSize:10,letterSpacing:2,color:TH.textDim,textTransform:"uppercase",marginBottom:6},}, "Data")
-                , React.createElement('button', { onClick: ()=>{if(confirm("Clear all saved profiles?")){saveP([])}}, style: {padding:"8px 14px",borderRadius:8,background:"rgba(239,68,68,0.08)",color:"#ef4444",border:"1px solid rgba(239,68,68,0.2)",fontFamily:FONT,fontSize:12,cursor:"pointer"},}, "Clear All Profiles"  )
-              )
-              , React.createElement('div', { style: {padding:14,background:TH.bgCard,borderRadius:12,border:`1px solid ${TH.borderLight}`},}
-                , React.createElement('div', { style: {fontSize:10,letterSpacing:2,color:TH.textDim,textTransform:"uppercase",marginBottom:6},}, "About Celestia v2"  )
-                , React.createElement('div', { style: {fontSize:11,color:TH.textMuted,lineHeight:1.6},}, "Client-side natal chart calculator · VSOP87 + ELP2000 · 14 celestial bodies · 6 house systems · Western Tropical + Vedic Sidereal · 27 Nakshatras · Synastry · Progressions · Solar Returns · Ephemeris · Essential Dignities · Aspect Patterns · Dark/Light themes · Export/Import · No server required."                                                )
-              )
-            )
-          )
-        )
+        {/* ── SETTINGS ── */}
+        {page==="settings"&&(
+          <div style={{maxWidth:480}}>
+            <h2 style={{fontFamily:FONT_D,fontSize:26,fontWeight:400,color:TH.lavender,marginBottom:20}}>Settings</h2>
+            <div style={{display:"flex",flexDirection:"column",gap:16}}>
+              <div>
+                <div style={{fontSize:10,letterSpacing:2,color:TH.textDim,textTransform:"uppercase",marginBottom:6}}>Theme</div>
+                <div style={{display:"flex",gap:6}}>
+                  {["dark","light"].map(t=><button key={t} onClick={()=>setThemeId(t)} style={{flex:1,padding:10,borderRadius:8,background:themeId===t?TH.accentSoft:TH.bgCard,color:themeId===t?TH.accent:TH.textMuted,border:`1px solid ${themeId===t?TH.accent+"40":TH.borderLight}`,fontFamily:FONT,fontSize:13,cursor:"pointer",fontWeight:600,textTransform:"capitalize"}}>{t==="dark"?"☽ Dark":"☀ Light"}</button>)}
+                </div>
+              </div>
+              <div>
+                <div style={{fontSize:10,letterSpacing:2,color:TH.textDim,textTransform:"uppercase",marginBottom:6}}>Zodiac System</div>
+                <div style={{display:"flex",gap:6}}>
+                  {["tropical","sidereal"].map(s=><button key={s} onClick={()=>{setZsys(s);reCalc(hsys,s)}} style={{flex:1,padding:10,borderRadius:8,background:zsys===s?TH.accentSoft:TH.bgCard,color:zsys===s?TH.accent:TH.textMuted,border:`1px solid ${zsys===s?TH.accent+"40":TH.borderLight}`,fontFamily:FONT,fontSize:13,cursor:"pointer",fontWeight:600}}>{s==="tropical"?"♈ Western Tropical":"☸ Vedic Sidereal"}</button>)}
+                </div>
+              </div>
+              <div>
+                <div style={{fontSize:10,letterSpacing:2,color:TH.textDim,textTransform:"uppercase",marginBottom:6}}>House System</div>
+                <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:6}}>
+                  {HSYS.map(h=><button key={h.id} onClick={()=>{setHsys(h.id);reCalc(h.id,zsys)}} style={{padding:10,borderRadius:8,background:hsys===h.id?TH.accentSoft:TH.bgCard,color:hsys===h.id?TH.accent:TH.textMuted,border:`1px solid ${hsys===h.id?TH.accent+"40":TH.borderLight}`,fontFamily:FONT,fontSize:12,cursor:"pointer",textAlign:"left"}}><div style={{fontWeight:600}}>{h.n}</div><div style={{fontSize:10,color:TH.textDim,marginTop:1}}>{h.d}</div></button>)}
+                </div>
+              </div>
+              <div>
+                <div style={{fontSize:10,letterSpacing:2,color:TH.textDim,textTransform:"uppercase",marginBottom:6}}>AI Integration (Optional)</div>
+                <div style={{background:TH.bgCard,border:`1px solid ${TH.cardBorder}`,borderRadius:12,padding:14}}>
+                  <div style={{fontSize:12,color:TH.textMuted,lineHeight:1.6}}>To enable AI-powered interpretations, add your API key below. Readings are generated locally — your data never leaves your machine.</div>
+                  <input placeholder="API Key (optional)" style={{width:"100%",marginTop:8,padding:"8px 12px",borderRadius:6,background:TH.inputBg,border:`1px solid ${TH.border}`,color:TH.text,fontFamily:FONT,fontSize:12,outline:"none"}}/>
+                </div>
+              </div>
+              <div>
+                <div style={{fontSize:10,letterSpacing:2,color:TH.textDim,textTransform:"uppercase",marginBottom:6}}>Data</div>
+                <button onClick={()=>{if(confirm("Clear all saved profiles?")){saveP([])}}} style={{padding:"8px 14px",borderRadius:8,background:"rgba(239,68,68,0.08)",color:"#ef4444",border:"1px solid rgba(239,68,68,0.2)",fontFamily:FONT,fontSize:12,cursor:"pointer"}}>Clear All Profiles</button>
+              </div>
+              <div style={{padding:14,background:TH.bgCard,borderRadius:12,border:`1px solid ${TH.borderLight}`}}>
+                <div style={{fontSize:10,letterSpacing:2,color:TH.textDim,textTransform:"uppercase",marginBottom:6}}>About Celestia v2</div>
+                <div style={{fontSize:11,color:TH.textMuted,lineHeight:1.6}}>Client-side natal chart calculator · VSOP87 + ELP2000 · 14 celestial bodies · 6 house systems · Western Tropical + Vedic Sidereal · 27 Nakshatras · Synastry · Progressions · Solar Returns · Ephemeris · Essential Dignities · Aspect Patterns · Dark/Light themes · Export/Import · No server required.</div>
+              </div>
+            </div>
+          </div>
+        )}
 
-      )
-    )
+      </main>
+    </div>
   );
 }
-
-
-  const root = ReactDOM.createRoot(document.getElementById('root'));
-  root.render(React.createElement(Celestia));
-}
-
-
-try {
-  appMain();
-} catch(e) {
-  document.getElementById('root').innerHTML = '<div style="padding:20px;color:#ef4444;font-family:monospace;font-size:11px;white-space:pre-wrap"><h2 style="color:#fbbf24">App Error</h2>' + e.message + '\n\n' + (e.stack||'') + '</div>';
-}
-</script>
-</body>
-</html>

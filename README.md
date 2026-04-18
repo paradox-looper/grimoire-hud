@@ -1,101 +1,79 @@
-# ⚔️ Grimoire HUD v4.0 — AD&D 2nd Edition Player Companion
+# ✦ Celestia — Natal Chart Studio
 
-A mobile-first, offline-capable character manager and player HUD for Advanced Dungeons & Dragons 2nd Edition. Features a Diablo-style equipment screen, 485 searchable spells, 28 playable races (PHB + Complete Book of Humanoids), and persistent local storage. Zero dependencies. Free on GitHub Pages.
+Precision natal chart astrology with transit forecasting. Private, offline-capable, beautiful.
 
-## ✨ Features
+**Live Demo:** [paradox-looper.github.io/celestia](https://paradox-looper.github.io/celestia)
 
-### 28 Playable Races
-- **PHB (6):** Human, Elf, Half-Elf, Dwarf, Gnome, Halfling
-- **PHBR10 Complete Book of Humanoids (22):** Aarakocra, Alaghi, Beastman, Bugbear, Bullywug, Centaur, Firbolg, Voadkyn, Flind, Fremlin, Gnoll, Goblin, Half-Ogre, Half-Orc, Hobgoblin, Kobold, Lizard Man, Minotaur, Mongrelman, Ogre, Ogre Mage, Orc
-- Full ability adjustments, class restrictions, level limits, special abilities per race
+## Features
 
-### Diablo-Style Equipment Screen
-- 11 equipment slots with tap-to-equip workflow
-- Race/class/sex-accurate procedural SVG portrait
-- Slot swap popup with qualifying inventory items
-- Live stat updates (THAC0, AC, HP, Movement) on gear changes
-- 6 sub-tabs: Equipment, Consumables, Quest, Materials, Coins, Gems
+### Core Chart
+- **14 celestial bodies** — Sun, Moon, Mercury, Venus, Mars, Jupiter, Saturn, Uranus, Neptune, Pluto, Chiron, Lilith, North Node, South Node
+- **Accurate Placidus houses** — verified to arcminute precision against astro.com
+- **Whole Sign houses** — for Hellenistic and Vedic traditions
+- **Dual zodiac** — Western Tropical and Vedic Sidereal (Lahiri)
+- **27 Nakshatras** — lunar mansion for Vedic readings
+- **Interactive chart wheel** — tap any planet, sign, house, or aspect
 
-### Complete Rules Engine
-- All 6 ability score tables with every sub-attribute
-- Dual-class (Humans) and Multi-class (Demihumans) support
-- THAC0, saving throws, spell slots per class and level
-- 15 PHB armor types with auto AC calculation
-- Tappable ability scores with draggable detail popups
+### Interpretation Content
+- **120 planet-sign combinations** with multi-paragraph depth
+- **12 house interpretations** with rich context
+- **Aspect library** — hand-crafted for major planetary pairs
+- **Career & Finance tab** — MC, 2nd/6th/8th/10th houses, Saturn/Jupiter/Venus analysis
+- **Essential Dignities** — rulership, exaltation, detriment, fall
+- **Pattern recognition** — stelliums, T-squares, grand trines, yods
 
-### 485 Searchable Spells
-- 310 wizard spells (levels 1-9) + 175 priest spells (levels 1-7)
-- Search by name, filter by level
-- Spellbook management with memorization tracking
-- Spell detail modal with all PHB attributes
+### Transits
+- **Now view** — 12 most significant current transits, with full interpretations
+- **12-Month Forecast** — intensity chart + monthly narratives + expandable cards
+- **540-combination matrix** — Transit × Aspect × Natal Point with sign and retrograde context
+- **64 milestone overrides** — Saturn Return, Uranus Opposition, Jupiter Return, etc.
 
-### Inventory & Treasure
-- Smart item detection (60+ name patterns → correct icon and category)
-- 35+ predefined D&D gem types by value tier
-- Quick Loot popup for rapid item acquisition
-- Encumbrance tracking (weight vs STR allowance)
+### Advanced
+- **Synastry** — chart comparison between two people
+- **Secondary Progressions** — day-for-a-year advanced chart
+- **Solar Return** — annual return chart
+- **Ephemeris** — full planetary positions for any month
 
-### Special Abilities Card
-- Race-specific: natural AC, size, movement, advantages, disadvantages, languages
-- Class-specific: up to 12 class abilities per class
-- Level limits for humanoid races
+### Privacy & Performance
+- **Fully client-side** — your birth data never leaves your device
+- **Offline-capable** — PWA with service worker caching
+- **No account required** — nothing to sign up for
+- **No tracking** — zero analytics, zero cookies
 
-## 🚀 Setup
+## Quick Start
 
-1. **Fork** this repository
-2. **Settings → Pages → Source → main / root → Save**
-3. Live at `https://YOUR-USERNAME.github.io/grimoire-hud/`
-4. On phone: **Share → Add to Home Screen**
+Visit [paradox-looper.github.io/celestia](https://paradox-looper.github.io/celestia) — it just works.
 
-## 📁 Repository Structure
+On iPhone, tap **Share** → **Add to Home Screen** to install as an app.
 
-```
-grimoire-hud/
-├── index.html          ← The entire app (253KB, zero dependencies)
-├── 404.html            ← SPA fallback (identical copy)
-├── manifest.json       ← PWA manifest (13 icon sizes)
-├── sw.js               ← Service Worker v7 (offline caching)
-├── favicon.ico         ← Browser tab icon
-├── .nojekyll           ← Skip Jekyll processing
-├── icons/
-│   ├── icon-16.png     ← Favicon
-│   ├── icon-32.png
-│   ├── icon-48.png
-│   ├── icon-72.png
-│   ├── icon-96.png
-│   ├── icon-128.png
-│   ├── icon-144.png
-│   ├── icon-152.png
-│   ├── icon-167.png
-│   ├── icon-180.png
-│   ├── icon-192.png    ← Android home screen
-│   ├── icon-384.png
-│   ├── icon-512.png    ← Splash screen
-│   └── apple-touch-icon.png
-├── PROGRESS.md         ← Development history & completed loops
-├── NEXT_STEPS.md       ← Roadmap & architecture notes
-├── CHANGELOG.md        ← Version history
-├── README.md           ← This file
-└── LICENSE             ← MIT
-```
+## Self-Hosting
 
-## 📋 Tabs
+1. Download the latest release
+2. Extract to any static web server (Apache, nginx, GitHub Pages, Netlify, Vercel)
+3. That's it — no build step, no dependencies
 
-| Tab | Content |
-|-----|---------|
-| **HUD** | HP, Combat, Abilities (tappable), Saves, Special Abilities, Gold & XP, Spell Slots |
-| **EQUIP** | Diablo-style equipment slots + portrait + character details + inventory grid |
-| **COMBAT** | Effective THAC0, AC breakdown, to-hit table (AC 10 to -10), saving throws, dice roller |
-| **SPELLS** | Spell slot tracker, searchable spell browser, spellbook management |
-| **JOURNAL** | Adventure chronicle with timestamped entries |
+See [DEPLOY.md](DEPLOY.md) for detailed deployment instructions including iOS App Store publication.
 
-## 📜 Data Sources
+## Tech Stack
 
-- **Player's Handbook** (AD&D 2E) — Abilities, races, classes, equipment, spells
-- **PHBR10: Complete Book of Humanoids** — 22 humanoid races with full stat blocks
-- All data extracted and structured as canonical JSON in the project knowledge files
+- **React 18** — UI (loaded from CDN)
+- **Sucrase** — JSX transpilation at build time
+- **Astronomical engines** — VSOP87 (planets), ELP2000 (Moon), Kepler (Chiron), Meeus (nodes)
+- **OpenStreetMap Nominatim** — optional geocoding (falls back to 360-city offline database)
 
-## 📄 License
+## Accuracy Notes
 
-MIT License. See LICENSE file.
-AD&D is a trademark of Wizards of the Coast. This is an unofficial fan utility.
+- Inner planets (Sun–Mars): accurate to arcminutes
+- Outer planets (Saturn–Pluto): ~0.1–0.7° vs Swiss Ephemeris
+- Moon: ELP2000 top-22 terms, ~1'
+- Houses: Placidus verified against astro.com
+- Chiron: perihelion-based Keplerian, calibrated against Swiss Ephemeris
+- North Node: Mean Node (~2° from True Node)
+
+## License
+
+MIT — see [LICENSE](LICENSE)
+
+## Privacy
+
+See [PRIVACY.md](PRIVACY.md) — short version: nothing leaves your device.

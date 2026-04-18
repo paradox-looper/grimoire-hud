@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width"><title>CDN Test</title></head>
+<body style="background:#0a0a18;color:#e2e8f0;font-family:sans-serif;padding:20px">
+<h2>CDN Loading Test</h2>
+<div id="log" style="font-family:monospace;font-size:12px;line-height:2"></div>
+<script>
+function log(msg, ok) {
+  document.getElementById('log').innerHTML += '<div style="color:'+(ok?'#4ade80':'#ef4444')+'">'+msg+'</div>';
+}
+</script>
+<script>log('1. Testing unpkg React...');</script>
+<script src="https://unpkg.com/react@18.2.0/umd/react.production.min.js" 
+  onload="log('   unpkg React loaded ✓', true)" 
+  onerror="log('   unpkg React FAILED ✗', false)"></script>
+<script src="https://unpkg.com/react-dom@18.2.0/umd/react.production.min.js"
+  onload="log('   unpkg ReactDOM loaded ✓', true)"
+  onerror="log('   unpkg ReactDOM FAILED ✗', false)"></script>
+<script>
+if (typeof React !== 'undefined') {
+  log('2. React is defined: v' + React.version + ' ✓', true);
+} else {
+  log('2. React is UNDEFINED ✗', false);
+  log('3. Trying jsdelivr fallback...');
+}
+if (typeof ReactDOM !== 'undefined') {
+  log('   ReactDOM is defined ✓', true);
+  log('4. Rendering test component...');
+  try {
+    var root = ReactDOM.createRoot(document.createElement('div'));
+    root.render(React.createElement('div', null, 'works'));
+    log('   React render works ✓', true);
+  } catch(e) {
+    log('   React render FAILED: ' + e.message, false);
+  }
+} else {
+  log('   ReactDOM is UNDEFINED ✗', false);
+}
+</script>
+</body>
+</html>
